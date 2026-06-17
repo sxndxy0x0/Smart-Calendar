@@ -47,6 +47,7 @@ body,html{font-family:'Sarabun',sans-serif;font-size:14px;background:var(--bg);c
 .tab:hover{color:var(--text1)}
 .tab.active{color:var(--blue);border-bottom-color:var(--blue)}
 .tab i{font-size:15px}
+.tab-label-short{display:none}
 
 /* ── PANES ── */
 .pane{display:none;animation:fadeIn .2s ease}.pane.active{display:block}
@@ -570,12 +571,69 @@ body,html{font-family:'Sarabun',sans-serif;font-size:14px;background:var(--bg);c
   .left-rail{border-right:none;border-bottom:1px solid var(--border)}
   .week-layout{flex-direction:column}
   .week-sidebar{width:100%;min-width:0}
+
+  /* ── App header: stack into two rows on mobile ── */
+  .app-header{
+    flex-wrap:wrap;
+    padding:12px 14px 0;
+    gap:8px;
+  }
+  .app-logo{font-size:14px;order:1}
+  .app-logo .ver{display:none}
+  .dropdown{order:2;margin-left:auto}
+  .user-bar{margin-left:0;padding:5px 8px}
+  .user-name{font-size:11px}
+  .user-role{display:none}
+  .tabs{
+    order:3;
+    width:100%;
+    margin-left:0;
+    margin-top:4px;
+  }
+  .tab{
+    flex:1;
+    justify-content:center;
+    padding:9px 6px;
+    font-size:11px;
+    gap:4px;
+    white-space:nowrap;
+  }
 }
+@media(max-width:420px){
+  .tab-label-full{display:none}
+  .tab-label-short{display:inline}
+  .tab{font-size:11px;padding:9px 4px}
+}
+
 .ic{display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;vertical-align:-0.125em}
 .ic svg{width:100%;height:100%}
+/* ── BOOT LOADING SCREEN (prevents landing-page flash while auth state resolves) ── */
+#bootLoader{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999;transition:opacity .25s ease}
+#bootLoader.hidden{opacity:0;pointer-events:none}
+#bootLoader .boot-mark{width:44px;height:44px;border-radius:11px;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;animation:bootPulse 1.4s ease-in-out infinite}
+@keyframes bootPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(.9);opacity:.7}}
+/* landing is hidden by default at boot; JS reveals it only if no user is signed in */
+#landing.hidden{display:none}
 </style>
 </head>
 <body>
+
+<!-- ══════════════════════════════════════════════
+     BOOT LOADER — shown instantly, before any JS/auth check runs
+══════════════════════════════════════════════ -->
+<div id="bootLoader"><div class="boot-mark">✦</div></div>
+<script>
+  /* Safety net: if the module script is slow/blocked (slow network, ad-blocker,
+     CDN hiccup), don't leave the user staring at the loader forever. */
+  setTimeout(function(){
+    var bl=document.getElementById('bootLoader');
+    if(bl && !bl.classList.contains('hidden')){
+      document.getElementById('landing').classList.remove('hidden');
+      bl.classList.add('hidden');
+      setTimeout(function(){bl.remove();},300);
+    }
+  },8000);
+</script>
 
 <!-- ══════════════════════════════════════════════
      LANDING PAGE — shown before sign-in
@@ -587,7 +645,7 @@ body,html{font-family:'Sarabun',sans-serif;font-size:14px;background:var(--bg);c
   <div class="orb orb3"></div>
 </div>
 
-<div id="landing">
+<div id="landing" class="hidden">
 
   <nav class="land-nav">
     <div class="land-nav-inner">
@@ -762,8 +820,8 @@ body,html{font-family:'Sarabun',sans-serif;font-size:14px;background:var(--bg);c
       Smart Calendar
     </div>
     <div class="tabs">
-      <button class="tab active" onclick="switchTab('monthly')"><i class="ic" data-icon="calendar-month"></i>ปฏิทินรายเดือน</button>
-      <button class="tab" onclick="switchTab('weekly')"><i class="ic" data-icon="layout-grid"></i>ตารางเรียน</button>
+      <button class="tab active" onclick="switchTab('monthly')"><i class="ic" data-icon="calendar-month"></i><span class="tab-label-full">ปฏิทินรายเดือน</span><span class="tab-label-short">ปฏิทิน</span></button>
+      <button class="tab" onclick="switchTab('weekly')"><i class="ic" data-icon="layout-grid"></i><span class="tab-label-full">ตารางเรียน</span><span class="tab-label-short">ตาราง</span></button>
     </div>
     <!-- USER BAR -->
     <div class="dropdown" id="userDropdown" style="display:none">
@@ -1740,6 +1798,7 @@ window.doLogout=doLogout;
 
 /* ── Auth State Observer ── */
 onAuthStateChanged(auth, async user=>{
+  const bootLoader=document.getElementById('bootLoader');
   if(user){
     const shareCode=genShareCode(user.uid);
     currentUser={uid:user.uid,displayName:user.displayName||user.email,email:user.email,isGuest:false,shareCode,shareEnabled:false,shareCourses:false};
@@ -1749,7 +1808,11 @@ onAuthStateChanged(auth, async user=>{
     updateUserBar();
     await loadUserProfile();
     subscribeUserData();
+  }else{
+    document.getElementById('app').classList.add('hidden');
+    document.getElementById('landing').classList.remove('hidden');
   }
+  if(bootLoader){bootLoader.classList.add('hidden');setTimeout(()=>bootLoader.remove(),300);}
 });
 
 /* ── User Bar ── */
