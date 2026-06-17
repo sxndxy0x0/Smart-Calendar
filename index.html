@@ -1107,6 +1107,28 @@ new MutationObserver(muts => {
 }).observe(document.body, {childList: true, subtree: true});
 
 /* ══════════════════════════════════════════════
+   SCROLL REVEAL — fades in .reveal elements as they enter view
+══════════════════════════════════════════════ */
+(function initReveal(){
+  const els = document.querySelectorAll('.reveal');
+  if (!els.length) return;
+  if (!('IntersectionObserver' in window)) {
+    els.forEach(el => el.classList.add('visible'));
+    return;
+  }
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
+  els.forEach(el => io.observe(el));
+})();
+
+
+/* ══════════════════════════════════════════════
    DATA & CONSTANTS
 ══════════════════════════════════════════════ */
 let events = [], courses = [];
