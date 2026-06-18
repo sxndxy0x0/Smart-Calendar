@@ -1633,7 +1633,7 @@ function parseBulk(){
   const st=document.getElementById('bulkStatus');st.className='status-bar status-ok';st.textContent=`✓ เพิ่ม ${added} วิชาแล้ว`;
   setTimeout(()=>{st.textContent='';st.className='status-bar';},3000);saveUserData();
 }
-function delCourse(id){courses=courses.filter(c=>c.id!==id);renderCourseList();renderTimetable();saveUserData();}
+async function delCourse(id){if(!await scConfirm('ลบวิชานี้ออกจากตาราง?',{title:'ยืนยันการลบ',danger:true}))return;courses=courses.filter(c=>c.id!==id);renderCourseList();renderTimetable();renderCourseListView();saveUserData();}
 async function clearAllCourses(){if(await scConfirm('ล้างตารางเรียนทั้งหมด?',{title:'ยืนยัน',danger:true})){courses=[];renderCourseList();renderTimetable();saveUserData();}}
 function renderCourseList(){
   const el=document.getElementById('courseList');const stats=document.getElementById('weekStats');
@@ -1974,9 +1974,11 @@ async function loadUserProfile(){
 }
 
 /* ── Subscribe User Data ── */
+let _isSaving=false;
 function subscribeUserData(){
   if(unsubSnapshot){unsubSnapshot();unsubSnapshot=null;}
   unsubSnapshot=onSnapshot(doc(db,'users',currentUser.uid,'data','main'),snap=>{
+    if(_isSaving)return; // ข้ามถ้ากำลัง save อยู่ เพื่อไม่ให้ snapshot เก่า overwrite
     if(snap.exists()){const d=snap.data();events=d.events||[];courses=d.courses||[];}
     else{events=[];courses=[];}
     renderCalendar();renderEventList();updateStats();renderCourseList();renderTimetable();renderCourseListView();
@@ -1985,10 +1987,12 @@ function subscribeUserData(){
 
 async function saveUserData(){
   if(!currentUser||currentUser.isGuest)return;
+  _isSaving=true;
   try{
     await setDoc(doc(db,'users',currentUser.uid,'data','main'),{events,courses,updatedAt:Date.now()});
     if(currentUser.shareEnabled)await pushSharedData();
   }catch(e){console.warn('save:',e);}
+  finally{setTimeout(()=>{_isSaving=false;},1000);} // รอ 1s ให้ snapshot ที่ triggered โดย save นี้ผ่านไปก่อน
 }
 setInterval(()=>{if(currentUser&&!currentUser.isGuest)saveUserData();},30000);
 
