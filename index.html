@@ -184,7 +184,7 @@ body,html{font-family:'Sarabun',sans-serif;font-size:14px;background:var(--bg);c
 
 .tt-scroll{overflow-x:auto;padding:16px;flex:1}
 .tt{border-collapse:collapse;width:100%;table-layout:fixed}
-.tt-time-col{width:52px}
+.tt-time-col{width:42px}
 .tt th{padding:8px 6px;text-align:center;font-size:11px;font-weight:600;color:var(--text2);border:1px solid var(--border);background:var(--bg2);overflow:hidden;letter-spacing:.03em}
 .tt td{border:1px solid var(--border);vertical-align:top;height:58px;position:relative}
 .tt td.time-label{text-align:center;font-size:10px;font-weight:600;color:var(--text3);background:var(--bg2);padding:0 6px;white-space:nowrap;font-family:'IBM Plex Mono',monospace;vertical-align:middle}
@@ -547,18 +547,24 @@ body,html{font-family:'Sarabun',sans-serif;font-size:14px;background:var(--bg);c
   /* week main no overflow on mobile */
   .week-main{overflow-x:hidden}
 
-  /* timetable */
-  .tt-scroll{padding:8px 0}
-  .tt th,.tt td{font-size:9px;padding:3px 4px}
-  .tt th:first-child,.tt td:first-child{padding:3px 5px;font-size:9px}
+  /* timetable — scroll แนวนอนบนมือถือ */
+  .tt-scroll{padding:0;-webkit-overflow-scrolling:touch}
+  .tt{table-layout:auto;width:auto;min-width:100%}
+  .tt-time-col{width:32px}
+  .tt th,.tt td{font-size:9px;padding:3px 4px;min-width:52px}
+  .tt th:first-child,.tt td:first-child{min-width:32px;padding:3px 4px;font-size:9px;position:sticky;left:0;z-index:3;background:var(--bg2)}
+  .tt td.time-label{position:sticky;left:0;z-index:3}
+  .tt-block{font-size:8.5px}
+  .tb-code{font-size:8.5px}
+  .tb-room,.tb-group{font-size:7.5px}
   .tt-block{font-size:8px;padding:3px 4px;line-height:1.2}
   .tt-block .tb-code{font-size:8px}
   .tt-block .tb-room,.tt-block .tb-group{font-size:7px}
 
   /* week header */
-  .week-header{flex-wrap:wrap;gap:6px;padding:12px 12px 8px}
-  .week-title{font-size:14px}
-  .week-subtitle{font-size:11px}
+  .week-header{flex-wrap:wrap;gap:6px;padding:10px 12px}
+  .week-title{font-size:13px}
+  .week-subtitle{margin-left:0;font-size:10px}
 
   /* list view */
   #courseListView{overflow-x:auto}
@@ -574,8 +580,8 @@ body,html{font-family:'Sarabun',sans-serif;font-size:14px;background:var(--bg);c
   .tab-label-short{display:inline}
 
   /* timetable แคบมาก */
-  .tt th,.tt td{font-size:8px;padding:2px 3px}
-  .tt th:first-child,.tt td:first-child{padding:2px 3px;font-size:8px}
+  .tt th,.tt td{font-size:8px;padding:2px 3px;min-width:46px}
+  .tt th:first-child,.tt td:first-child{min-width:28px;padding:2px 3px;font-size:8px}
   .tt-block{font-size:7px;padding:2px 3px}
 
   /* ซ่อนคอลัมน์ห้องบนตารางรายการ มือถือเล็กมาก */
