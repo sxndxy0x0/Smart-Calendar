@@ -1677,10 +1677,11 @@ function parseBulk(){
   lines.forEach(line=>{
     const day=parseDayTH(line);if(day===null)return;
     const timeR=parseTimeRange(line);if(!timeR)return;
-    const codeM=line.match(/([A-Z]{2,}[\d\-]+)/i);
-    const roomM=line.match(/([A-Z]{2}\d{3,}|\d{4,}|ST\d+|AD\d+|ป\S+)/i);
+    const codeM=line.match(/([A-Z]{2,}[\d\-]+|\d{6,})/i);
+    const nameM=line.match(/\d{6,}\s*[-–]\s*([A-Za-z\u0E00-\u0E7F]+)/i);
+    const roomM=line.match(/([A-Z]{2,}\d{3,}|ST\d+|AD\d+|ป\S+)/i);
     const groupM=line.match(/\((\S+)\)/);
-    courses.push({id:Date.now()+added,code:codeM?codeM[1]:'วิชาใหม่',day,start:timeR.start,end:timeR.end,room:roomM?roomM[roomM.length-1]:'',group:groupM?groupM[1]:'',color:PALETTE[courses.length%PALETTE.length]});added++;
+    courses.push({id:Date.now()+added,code:codeM?codeM[1]:'วิชาใหม่',name:nameM?nameM[1]:'',day,start:timeR.start,end:timeR.end,room:roomM?roomM[roomM.length-1]:'',group:groupM?groupM[1]:'',color:PALETTE[courses.length%PALETTE.length]});added++;
   });
   renderCourseList();renderTimetable();document.getElementById('bulkInput').value='';
   const st=document.getElementById('bulkStatus');st.className='status-bar status-ok';st.textContent=`✓ เพิ่ม ${added} วิชาแล้ว`;
@@ -1766,37 +1767,37 @@ function renderTimetable(){
   const sidebar=document.getElementById('weekSidebar');
   if(sidebar){sidebar.style.display=ro?'none':'';}
   if(!src.length){tt.innerHTML='<tr><td style="padding:30px;text-align:center;color:var(--text3);font-size:13px">ยังไม่มีวิชาในตาราง</td></tr>';return;}
-  const SLOT=60; // นาทีต่อ 1 คอลัมน์ (รายชั่วโมงเต็ม เหมือนตารางต้นฉบับ)
+  const SLOT=30; // 30 นาทีต่อ 1 คอลัมน์ เพื่อรองรับวิชาที่เริ่ม/จบครึ่งชั่วโมง
   const toMin=t=>{const[h,m]=t.split(':').map(Number);return h*60+m;};
   const allMins=src.flatMap(c=>[toMin(c.start),toMin(c.end)]);
   let minMin=Math.floor(Math.min(...allMins)/SLOT)*SLOT;
   let maxMin=Math.ceil(Math.max(...allMins)/SLOT)*SLOT;
-  minMin=Math.min(minMin,7*60);maxMin=Math.max(maxMin,20*60);
-  const slots=[];for(let m=minMin;m<maxMin;m+=SLOT)slots.push(m);
-  const days=[1,2,3,4,5,6,0]; // แสดงทุกวันเสมอ จันทร์→อาทิตย์
+  minMin=Math.min(minMin,7*60);maxMin=Math.max(maxMin,19*60+30);
+  const slots=[];for(let m=minMin;m<=maxMin;m+=SLOT)slots.push(m);
+  const days=[1,2,3,4,5,6,0];
   const now=new Date();const nowMin=now.getHours()*60+now.getMinutes();const todayDow=now.getDay();
   let html=`<colgroup><col class="tt-time-col"/>${slots.map(()=>'<col/>').join('')}</colgroup>`;
-  html+=`<tr><th></th>${slots.map(m=>`<th>${Math.floor(m/60)}:00</th>`).join('')}</tr>`;
+  html+=`<tr><th></th>${slots.map(m=>`<th style="font-size:9px">${Math.floor(m/60)}:${m%60===0?'00':'30'}</th>`).join('')}</tr>`;
   days.forEach(dayIdx=>{
     html+=`<tr><td class="time-label">${DAY_FULL[dayIdx].slice(0,3)}<br><small>${DAY_SHORT[dayIdx]}</small></td>`;
     const row=slots.map(()=>({span:1,content:'',skip:false}));
     src.filter(c=>c.day===dayIdx).forEach(c=>{
       const s=toMin(c.start),e=toMin(c.end);
-      const colStart=Math.floor((s-minMin)/SLOT);
-      const colEndExcl=Math.min(slots.length, Math.ceil((e-minMin)/SLOT));
+      const colStart=Math.round((s-minMin)/SLOT);
+      const colEndExcl=Math.min(slots.length, Math.round((e-minMin)/SLOT));
       const colSpan=Math.max(1,Math.min(colEndExcl-colStart, slots.length-colStart));
       if(colStart<0||colStart>=row.length)return;
       const spanMin=colSpan*SLOT;
-      const offsetPct=((s-minMin-colStart*SLOT)/spanMin)*100;
+      const offsetPct=((s-(minMin+colStart*SLOT))/spanMin)*100;
       const widthPct=((e-s)/spanMin)*100;
       for(let i=colStart;i<colStart+colSpan&&i<row.length;i++){
         if(i===colStart){
-          row[i].content=`<div class="tt-block" style="background:${c.color};left:${offsetPct}%;width:${widthPct}%"${ro?'':` onclick="showCourseModal(${c.id})"`}>
+          row[i].content=`<div class="tt-block" style="background:${c.color};left:0;right:0;width:auto"${ro?'':` onclick="showCourseModal(${c.id})"`}>
             <div class="tb-code">${c.code}</div>
             ${c.group?`<div class="tb-group">(${c.group})</div>`:''}
             ${c.room?`<div class="tb-room">${c.room}</div>`:''}
           </div>`;row[i].span=colSpan;
-        }else row[i].skip=true;
+        }else{row[i].skip=true;}
       }
     });
     // now-line
