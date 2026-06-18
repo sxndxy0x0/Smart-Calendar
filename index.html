@@ -1771,7 +1771,7 @@ function renderTimetable(){
   const allMins=src.flatMap(c=>[toMin(c.start),toMin(c.end)]);
   let minMin=Math.floor(Math.min(...allMins)/SLOT)*SLOT;
   let maxMin=Math.ceil(Math.max(...allMins)/SLOT)*SLOT;
-  minMin=Math.min(minMin,7*60);maxMin=Math.max(maxMin,19*60);
+  minMin=Math.min(minMin,7*60);maxMin=Math.max(maxMin,20*60);
   const slots=[];for(let m=minMin;m<maxMin;m+=SLOT)slots.push(m);
   const days=[1,2,3,4,5,6,0]; // แสดงทุกวันเสมอ จันทร์→อาทิตย์
   const now=new Date();const nowMin=now.getHours()*60+now.getMinutes();const todayDow=now.getDay();
