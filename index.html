@@ -1575,7 +1575,7 @@ function renderEventList(){
       </div>
     </div>
     ${ro?'':`<div style="display:flex;gap:4px;flex-shrink:0">
-      <button class="ev-del" onclick="showEventModal(${ev.id})" style="color:var(--blue)"><i class="ic" data-icon="edit"></i></button>
+      <button class="ev-del" onclick="showEventModal(${ev.id})" style="color:var(--blue)"><i class="ic" data-icon="pencil"></i></button>
       <button class="ev-del" onclick="delEvent(${ev.id})"><i class="ic" data-icon="trash"></i></button>
     </div>`}
   </div>`).join('');
@@ -1807,7 +1807,8 @@ document.getElementById('courseModal').addEventListener('click',e=>{if(e.target=
 
 let _editEventId=null;
 function showEventModal(id){
-  const ev=events.find(x=>x.id===id);if(!ev)return;
+  id=Number(id);
+  const ev=events.find(x=>Number(x.id)===id);if(!ev)return;
   _editEventId=id;
   document.getElementById('evm-text').value=ev.text||'';
   if(ev.date){const pad=n=>String(n).padStart(2,'0');document.getElementById('evm-date').value=`${ev.date.y}-${pad(ev.date.m)}-${pad(ev.date.d)}`;}
@@ -1817,7 +1818,7 @@ function showEventModal(id){
   document.getElementById('evm-note').value=ev.note||'';
   document.getElementById('evModalDelBtn').onclick=()=>{delEvent(id);closeEventModal();};
   document.getElementById('evModalSaveBtn').onclick=()=>{
-    const idx=events.findIndex(x=>x.id===id);if(idx<0)return;
+    const idx=events.findIndex(x=>Number(x.id)===id);if(idx<0)return;
     const dv=document.getElementById('evm-date').value;
     let date=events[idx].date;
     if(dv){const[y,m,d]=dv.split('-').map(Number);date={y,m,d};}
