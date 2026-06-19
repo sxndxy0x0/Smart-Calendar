@@ -724,6 +724,8 @@ body,html{font-family:'Sarabun',sans-serif;font-size:14px;background:var(--bg);c
       setTimeout(function(){if(bl.parentNode)bl.remove();},300);
     }
     if(msg){
+      var overlay=document.getElementById('authOverlay');
+      if(overlay)overlay.classList.remove('hidden');
       var el=document.getElementById('authMsg');
       if(el){el.className='auth-msg err';el.textContent=msg;}
     }
@@ -2475,39 +2477,43 @@ function _isInAppBrowser(){
   return /FBAN|FBAV|FB_IAB|Instagram|Line\/|MicroMessenger|TikTok|Twitter/i.test(navigator.userAgent);
 }
 
+// แสดง error ให้เห็นทั้งใน authOverlay (ถ้าเปิดอยู่) และเปิด overlay ขึ้นมาเลยถ้ายังไม่เปิด
+// เพราะปุ่ม login บนหน้า landing ไม่ได้เปิด authOverlay ทำให้ error เดิมไม่มีใครเห็น
+function _showAuthError(msg){
+  const overlay=document.getElementById('authOverlay');
+  if(overlay)overlay.classList.remove('hidden');
+  const el=document.getElementById('authMsg');
+  if(el){el.className='auth-msg err';el.textContent=msg;}
+  else alert(msg);
+}
+
 async function doGoogleLogin(){
   if(_isInAppBrowser()){
-    const el=document.getElementById('authMsg');
-    if(el){el.className='auth-msg err';el.textContent='เบราว์เซอร์นี้ (เช่น LINE/Facebook) ไม่รองรับการเข้าสู่ระบบด้วย Google กรุณาเปิดลิงก์นี้ด้วย Chrome หรือ Safari แล้วลองอีกครั้ง';}
-    else{alert('เบราว์เซอร์นี้ไม่รองรับการเข้าสู่ระบบด้วย Google กรุณาเปิดด้วย Chrome หรือ Safari');}
+    _showAuthError('เบราว์เซอร์นี้ (เช่น LINE/Facebook) ไม่รองรับการเข้าสู่ระบบด้วย Google กรุณาเปิดลิงก์นี้ด้วย Chrome หรือ Safari แล้วลองอีกครั้ง');
     return;
   }
   const provider=new GoogleAuthProvider();
   provider.setCustomParameters({prompt:'select_account'});
-  if(_isMobile()){
-    // มือถือ: ใช้ redirect แทน popup (popup ถูก block บ่อย)
-    try{
-      try{sessionStorage.setItem('_cf_redirecting','1');}catch(e){}
-      await signInWithRedirect(auth,provider);
-    }
-    catch(e){
-      console.warn('redirect login error:',e);
-      try{sessionStorage.removeItem('_cf_redirecting');}catch(e2){}
-      const el=document.getElementById('authMsg');
-      if(el){el.className='auth-msg err';el.textContent='เข้าสู่ระบบไม่สำเร็จ กรุณาลองใหม่ ('+(e?.code||'unknown')+')';}
-    }
-  }else{
-    try{await signInWithPopup(auth,provider);}
-    catch(e){
-      if(e?.code==='auth/popup-blocked'||e?.code==='auth/cancelled-popup-request'){
-        // popup ถูก block → fallback redirect
-        try{
-          try{sessionStorage.setItem('_cf_redirecting','1');}catch(e){}
-          await signInWithRedirect(auth,provider);
-        }catch(e2){console.warn('redirect fallback error:',e2);}
-      } else if(e?.code!=='auth/popup-closed-by-user'){
-        console.warn('login error:',e);
+  // ใช้ popup เป็นหลักทั้งมือถือและเดสก์ท็อป — เพราะ signInWithRedirect บน Safari (iOS/macOS 16.1+)
+  // มีบั๊กที่รู้จักกันดี คือ redirect กลับมาแล้ว getRedirectResult() จะคืนค่า null แบบเงียบๆ
+  // ไม่มี error เลย ทำให้ผู้ใช้ล็อกอินไม่ได้แต่ไม่รู้สาเหตุ (ดู firebase/firebase-js-sdk#6716)
+  // popup ใช้งานได้ปกติบน Safari/Chrome มือถือรุ่นใหม่ๆ ส่วนใหญ่ จึงปลอดภัยกว่าเป็นค่าเริ่มต้น
+  try{
+    await signInWithPopup(auth,provider);
+  }catch(e){
+    if(e?.code==='auth/popup-blocked'||e?.code==='auth/operation-not-supported-in-this-environment'||e?.code==='auth/cancelled-popup-request'){
+      // popup ใช้ไม่ได้จริงๆ ในเบราว์เซอร์นี้ → fallback เป็น redirect
+      try{
+        sessionStorage.setItem('_cf_redirecting','1');
+        await signInWithRedirect(auth,provider);
+      }catch(e2){
+        console.warn('redirect fallback error:',e2);
+        try{sessionStorage.removeItem('_cf_redirecting');}catch(e3){}
+        _showAuthError('เข้าสู่ระบบไม่สำเร็จ กรุณาลองใหม่ ('+(e2?.code||'unknown')+')');
       }
+    }else if(e?.code!=='auth/popup-closed-by-user'){
+      console.warn('login error:',e);
+      _showAuthError('เข้าสู่ระบบไม่สำเร็จ กรุณาลองใหม่ ('+(e?.code||'unknown')+')');
     }
   }
 }
@@ -2551,8 +2557,7 @@ const _redirectResultPromise=getRedirectResult(auth).then(r=>{
   try{sessionStorage.removeItem('_cf_redirecting');}catch(e2){}
   console.warn('getRedirectResult error:',e?.code,e?.message);
   if(e?.code&&e.code!=='auth/null-user'&&e.code!=='auth/no-auth-event'){
-    const el=document.getElementById('authMsg');
-    if(el){el.className='auth-msg err';el.textContent='เข้าสู่ระบบไม่สำเร็จ กรุณาลองใหม่ ('+e.code+')';}
+    _showAuthError('เข้าสู่ระบบไม่สำเร็จ กรุณาลองใหม่ ('+e.code+')');
   }
 });
 
