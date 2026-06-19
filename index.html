@@ -1911,11 +1911,21 @@ function renderTimetable(){
   let minMin=Math.floor(Math.min(...allMins)/SLOT)*SLOT;
   let maxMin=Math.ceil(Math.max(...allMins)/SLOT)*SLOT;
   minMin=Math.min(minMin,7*60);maxMin=Math.max(maxMin,19*60+30);
-  const slots=[];for(let m=minMin;m<=maxMin;m+=SLOT)slots.push(m);
+  const slots=[];for(let m=minMin;m<maxMin;m+=SLOT)slots.push(m);
   const days=[1,2,3,4,5,6,0];
   const now=new Date();const nowMin=now.getHours()*60+now.getMinutes();const todayDow=now.getDay();
   let html=`<colgroup><col class="tt-time-col"/>${slots.map(()=>'<col/>').join('')}</colgroup>`;
-  html+=`<tr><th></th>${slots.map(m=>`<th style="font-size:9px">${Math.floor(m/60)}:${m%60===0?'00':'30'}</th>`).join('')}</tr>`;
+  let headHTML='';
+  for(let i=0;i<slots.length;i++){
+    const m=slots[i];
+    if(m%60===0&&slots[i+1]===m+30){
+      headHTML+=`<th colspan="2" style="font-size:9px">${Math.floor(m/60)}:00</th>`;
+      i++; // ข้ามคอลัมน์ :30 ที่ถูกรวมเข้ามาแล้ว
+    }else{
+      headHTML+=`<th style="font-size:9px">${Math.floor(m/60)}:${m%60===0?'00':'30'}</th>`;
+    }
+  }
+  html+=`<tr><th></th>${headHTML}</tr>`;
   days.forEach(dayIdx=>{
     html+=`<tr><td class="time-label">${DAY_FULL[dayIdx].slice(0,3)}<br><small>${DAY_SHORT[dayIdx]}</small></td>`;
     const row=slots.map(()=>({span:1,content:'',skip:false}));
