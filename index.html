@@ -703,10 +703,11 @@ body,html{font-family:'Sarabun',sans-serif;font-size:14px;background:var(--bg);c
 <div id="bootLoader"><div class="boot-mark">✦</div><div id="bootMsg" style="margin-top:14px;font-size:12px;color:var(--text3);font-family:'Sarabun',sans-serif;text-align:center"></div></div>
 <script>
   // ตรวจสอบว่าเพิ่งกลับมาจาก redirect login หรือเคย login มาก่อน
+  // หมายเหตุ: ไม่ลบ _cf_redirecting ตรงนี้ — ปล่อยให้โค้ด Firebase (getRedirectResult) เป็นคนลบ
+  // เพื่อกันกรณี race condition ที่ flag ถูกลบไปก่อนที่ Firebase จะอ่านมันทัน
   var _isRedirecting=false;
   try{
     if(sessionStorage.getItem('_cf_redirecting')){
-      sessionStorage.removeItem('_cf_redirecting');
       _isRedirecting=true;
       var bm=document.getElementById('bootMsg');
       if(bm)bm.textContent='กำลังเข้าสู่ระบบ...';
@@ -715,26 +716,33 @@ body,html{font-family:'Sarabun',sans-serif;font-size:14px;background:var(--bg);c
 
   var _hadLogin=localStorage.getItem('sc_uid');
 
-  // ถ้ากำลัง redirect หรือเคย login → รอ Firebase ก่อน ไม่แสดง landing เร็ว
-  // ถ้าไม่เคย login เลย → แสดง landing หลัง 1.5s
-  if(!_hadLogin && !_isRedirecting){
-    setTimeout(function(){
-      var bl=document.getElementById('bootLoader');
-      if(bl&&!bl.classList.contains('hidden')){
-        document.getElementById('landing').classList.remove('hidden');
-        bl.classList.add('hidden');
-        setTimeout(function(){if(bl.parentNode)bl.remove();},300);
-      }
-    },1500);
-  }
-  // fallback: redirect อาจใช้เวลา 8s กว่า Firebase จะ resolve
-  var _fallbackMs = _isRedirecting ? 10000 : 5000;
-  setTimeout(function(){
+  function _revealLanding(msg){
     var bl=document.getElementById('bootLoader');
     if(bl&&!bl.classList.contains('hidden')){
       document.getElementById('landing').classList.remove('hidden');
       bl.classList.add('hidden');
       setTimeout(function(){if(bl.parentNode)bl.remove();},300);
+    }
+    if(msg){
+      var el=document.getElementById('authMsg');
+      if(el){el.className='auth-msg err';el.textContent=msg;}
+    }
+    try{sessionStorage.removeItem('_cf_redirecting');}catch(e){}
+  }
+
+  // ถ้ากำลัง redirect หรือเคย login → รอ Firebase ก่อน ไม่แสดง landing เร็ว
+  // ถ้าไม่เคย login เลย → แสดง landing หลัง 1.5s
+  if(!_hadLogin && !_isRedirecting){
+    setTimeout(function(){_revealLanding();},1500);
+  }
+  // fallback เด็ดขาด: ไม่ว่ากรณีไหนก็ตาม ถ้า Firebase ไม่ตอบสนองภายในเวลานี้
+  // (เช่น เน็ตหลุด, เบราว์เซอร์ในแอปบล็อก storage, redirect ล้มเหลวเงียบๆ) ให้เด้งกลับ landing เสมอ
+  // กันหน้าจอค้างถาวรบนมือถือ
+  var _fallbackMs = _isRedirecting ? 12000 : (_hadLogin ? 8000 : 5000);
+  setTimeout(function(){
+    var bl=document.getElementById('bootLoader');
+    if(bl&&!bl.classList.contains('hidden')){
+      _revealLanding(_isRedirecting?'เข้าสู่ระบบใช้เวลานานเกินไป กรุณาลองใหม่อีกครั้ง':null);
     }
   },_fallbackMs);
 </script>
@@ -2461,8 +2469,19 @@ function genShareCode(uid){let h=0;for(const c of uid)h=((h<<5)-h)+c.charCodeAt(
 
 /* ── Google Login ── */
 function _isMobile(){return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);}
+// เบราว์เซอร์ในแอป (LINE, Facebook, Instagram, TikTok ฯลฯ) มักบล็อก Google OAuth
+// ทำให้ signInWithRedirect ค้างหรือเด้งกลับมาแบบไม่มี user — ต้องเตือนแทนที่จะปล่อยให้ค้าง
+function _isInAppBrowser(){
+  return /FBAN|FBAV|FB_IAB|Instagram|Line\/|MicroMessenger|TikTok|Twitter/i.test(navigator.userAgent);
+}
 
 async function doGoogleLogin(){
+  if(_isInAppBrowser()){
+    const el=document.getElementById('authMsg');
+    if(el){el.className='auth-msg err';el.textContent='เบราว์เซอร์นี้ (เช่น LINE/Facebook) ไม่รองรับการเข้าสู่ระบบด้วย Google กรุณาเปิดลิงก์นี้ด้วย Chrome หรือ Safari แล้วลองอีกครั้ง';}
+    else{alert('เบราว์เซอร์นี้ไม่รองรับการเข้าสู่ระบบด้วย Google กรุณาเปิดด้วย Chrome หรือ Safari');}
+    return;
+  }
   const provider=new GoogleAuthProvider();
   provider.setCustomParameters({prompt:'select_account'});
   if(_isMobile()){
@@ -2471,7 +2490,12 @@ async function doGoogleLogin(){
       try{sessionStorage.setItem('_cf_redirecting','1');}catch(e){}
       await signInWithRedirect(auth,provider);
     }
-    catch(e){console.warn('redirect login error:',e);}
+    catch(e){
+      console.warn('redirect login error:',e);
+      try{sessionStorage.removeItem('_cf_redirecting');}catch(e2){}
+      const el=document.getElementById('authMsg');
+      if(el){el.className='auth-msg err';el.textContent='เข้าสู่ระบบไม่สำเร็จ กรุณาลองใหม่ ('+(e?.code||'unknown')+')';}
+    }
   }else{
     try{await signInWithPopup(auth,provider);}
     catch(e){
@@ -2488,25 +2512,6 @@ async function doGoogleLogin(){
   }
 }
 window.doGoogleLogin=doGoogleLogin;
-
-/* ── จัดการ redirect result หลัง page reload ── */
-getRedirectResult(auth).then(result=>{
-  // onAuthStateChanged จะ handle user เอง ไม่ต้องทำอะไรเพิ่ม
-  // result อาจเป็น null ถ้าไม่ได้มาจาก redirect — ปล่อยผ่าน
-}).catch(e=>{
-  // redirect ล้มเหลว → ซ่อน bootLoader แสดง landing พร้อม error
-  console.warn('getRedirectResult error:',e?.code,e?.message);
-  const bl=document.getElementById('bootLoader');
-  if(bl&&!bl.classList.contains('hidden')){
-    document.getElementById('landing').classList.remove('hidden');
-    bl.classList.add('hidden');
-    setTimeout(()=>{if(bl.parentNode)bl.remove();},300);
-  }
-  if(e?.code&&e.code!=='auth/null-user'&&e.code!=='auth/no-auth-event'){
-    const el=document.getElementById('authMsg');
-    if(el){el.className='auth-msg err';el.textContent='เข้าสู่ระบบไม่สำเร็จ กรุณาลองใหม่ ('+e.code+')';}
-  }
-});
 
 async function doLogout(){
   if(!await scConfirm('ต้องการออกจากระบบ?',{title:'ออกจากระบบ',danger:false}))return;
@@ -2537,7 +2542,19 @@ window.doLogout=doLogout;
 
 /* ── Auth State ── */
 let _redirectResultDone=false;
-const _redirectResultPromise=getRedirectResult(auth).then(r=>{_redirectResultDone=true;return r;}).catch(e=>{_redirectResultDone=true;});
+const _redirectResultPromise=getRedirectResult(auth).then(r=>{
+  _redirectResultDone=true;
+  try{sessionStorage.removeItem('_cf_redirecting');}catch(e){}
+  return r;
+}).catch(e=>{
+  _redirectResultDone=true;
+  try{sessionStorage.removeItem('_cf_redirecting');}catch(e2){}
+  console.warn('getRedirectResult error:',e?.code,e?.message);
+  if(e?.code&&e.code!=='auth/null-user'&&e.code!=='auth/no-auth-event'){
+    const el=document.getElementById('authMsg');
+    if(el){el.className='auth-msg err';el.textContent='เข้าสู่ระบบไม่สำเร็จ กรุณาลองใหม่ ('+e.code+')';}
+  }
+});
 
 onAuthStateChanged(auth,async user=>{
   const bl=document.getElementById('bootLoader');
