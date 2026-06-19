@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Smart Calendar</title>
+<title>ClassFlow</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjNThhNmZmIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2JjOGNmZiIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9InVybCgjZykiLz4KICA8cGF0aCBkPSJNMzIgMTQgQzM0IDI0LCA0MCAzMCwgNTAgMzIgQzQwIDM0LCAzNCA0MCwgMzIgNTAgQzMwIDQwLCAyNCAzNCwgMTQgMzIgQzI0IDMwLCAzMCAyNCwgMzIgMTQgWiIgZmlsbD0iI2ZmZmZmZiIvPgo8L3N2Zz4K"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet"/>
@@ -31,6 +31,25 @@
   --radius-sm:5px;
   --radius-lg:12px;
 }
+body.theme-light{
+  --bg:#f6f8fa;
+  --bg2:#ffffff;
+  --bg3:#eef1f5;
+  --bg4:#e7eaef;
+  --border:#d0d7de;
+  --border2:#b9c0c8;
+  --text1:#1b1f24;
+  --text2:#57606a;
+  --text3:#7c8590;
+  --blue:#0969da;
+  --blue-dim:rgba(9,105,218,.1);
+  --teal:#1a7f37;
+  --teal-dim:rgba(26,127,55,.1);
+  --amber:#9a6700;
+  --amber-dim:rgba(154,103,0,.12);
+  --red:#cf222e;
+  --purple:#8250df;
+}
 body,html{font-family:'Sarabun',sans-serif;font-size:14px;background:var(--bg);color:var(--text1);min-height:100vh}
 
 .app{max-width:1200px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
@@ -40,6 +59,14 @@ body,html{font-family:'Sarabun',sans-serif;font-size:14px;background:var(--bg);c
 .app-logo{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:700;color:var(--text1);letter-spacing:-.3px}
 .app-logo .logo-icon{width:30px;height:30px;background:linear-gradient(135deg,var(--blue),var(--purple));border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px;color:#fff;flex-shrink:0}
 .app-logo .ver{font-size:10px;font-family:'IBM Plex Mono',monospace;color:var(--text3);background:var(--bg4);border:1px solid var(--border);border-radius:4px;padding:1px 5px;margin-left:4px}
+
+.header-tools{display:flex;align-items:center;gap:10px}
+.live-clock{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--text2);background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:5px 9px;letter-spacing:.03em;white-space:nowrap}
+.live-clock .cs{color:var(--text3);font-size:10px}
+.theme-toggle{width:30px;height:30px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg3);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+.theme-toggle:hover{border-color:var(--blue);color:var(--blue)}
+.theme-toggle i{font-size:15px;display:flex}
+.theme-toggle svg{width:16px;height:16px}
 .tabs{display:flex;gap:0;margin-left:auto;padding-bottom:0}
 .tab{padding:10px 18px;font-size:13px;font-weight:500;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;transition:all .2s;display:flex;align-items:center;gap:7px;border-top:none;border-left:none;border-right:none;background:none}
 .tab:hover{color:var(--text1)}
@@ -221,6 +248,8 @@ body,html{font-family:'Sarabun',sans-serif;font-size:14px;background:var(--bg);c
 .tt-block{position:absolute;top:2px;bottom:2px;border-radius:5px;padding:5px 4px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;cursor:pointer;transition:all .2s;overflow:hidden;z-index:2;box-shadow:0 0 0 1px rgba(0,0,0,.25)}
 .tt-block::before{content:'';position:absolute;inset:0;background:rgba(255,255,255,0);transition:background .15s}
 .tt-block:hover::before{background:rgba(255,255,255,.08)}
+.tb-copy-badge{position:absolute;top:2px;right:2px;width:13px;height:13px;border-radius:3px;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;color:#fff;font-size:8px;z-index:3}
+.tb-copy-badge i{width:8px;height:8px}
 .tb-code{font-weight:700;font-size:11px;color:#fff;font-family:'IBM Plex Mono',monospace;white-space:nowrap}
 .tb-group{font-size:10px;color:rgba(255,255,255,.85);margin-top:1px}
 .tb-room{font-size:9px;color:#7be3a8;margin-top:2px;font-weight:600;white-space:nowrap}
@@ -425,6 +454,8 @@ body,html{font-family:'Sarabun',sans-serif;font-size:14px;background:var(--bg);c
 .friend-meta{font-size:10px;color:var(--text3);margin-top:1px}
 .friend-view-btn{font-size:11px;padding:5px 10px;border-radius:var(--radius-sm);background:var(--blue-dim);border:1px solid rgba(88,166,255,.3);color:var(--blue);cursor:pointer;font-family:'Sarabun',sans-serif;font-weight:500;flex-shrink:0;transition:all .15s}
 .friend-view-btn:hover,.friend-view-btn.is-viewing{background:var(--blue);color:#fff}
+.friend-view-btn.sent{background:var(--bg4);border-color:var(--border);color:var(--text3);cursor:default}
+.friend-view-btn.sent:hover{background:var(--bg4);color:var(--text3)}
 .friend-remove-btn{background:none;border:none;cursor:pointer;color:var(--text3);padding:4px;border-radius:4px;flex-shrink:0;transition:all .15s}
 .friend-remove-btn:hover{color:var(--red);background:rgba(248,81,73,.1)}
 .req-badge{display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;border-radius:8px;background:var(--red);color:#fff;font-size:9px;font-family:'IBM Plex Mono',monospace;padding:0 4px;margin-left:6px}
@@ -575,8 +606,10 @@ body,html{font-family:'Sarabun',sans-serif;font-size:14px;background:var(--bg);c
   .chat-back-btn{display:flex !important}
   .app-header{flex-wrap:wrap;padding:12px 14px 0;gap:8px}
   .app-logo{order:1}
-  .dropdown{order:2;margin-left:auto}
-  .tabs{order:3;width:100%;margin-left:0;margin-top:4px}
+  .header-tools{order:2;margin-left:auto}
+  .live-clock{font-size:10px;padding:4px 6px}
+  .dropdown{order:3;margin-left:0}
+  .tabs{order:4;width:100%;margin-left:0;margin-top:4px}
   .tab{flex:1;justify-content:center;padding:9px 6px;font-size:11px;gap:4px}
 
   /* calendar */
@@ -628,6 +661,11 @@ body,html{font-family:'Sarabun',sans-serif;font-size:14px;background:var(--bg);c
 </style>
 </head>
 <body>
+<script>
+  try{
+    if(localStorage.getItem('cf_theme')==='light') document.body.classList.add('theme-light');
+  }catch(e){}
+</script>
 
 <div id="bootLoader"><div class="boot-mark">✦</div></div>
 <script>
@@ -652,7 +690,7 @@ body,html{font-family:'Sarabun',sans-serif;font-size:14px;background:var(--bg);c
 <div id="landing" class="hidden">
   <nav class="land-nav">
     <div class="logo-icon">✦</div>
-    <div class="land-nav-name">Smart Calendar</div>
+    <div class="land-nav-name">ClassFlow</div>
     <button class="land-nav-cta" onclick="doGoogleLogin()">เข้าสู่ระบบ →</button>
   </nav>
 
@@ -708,7 +746,7 @@ body,html{font-family:'Sarabun',sans-serif;font-size:14px;background:var(--bg);c
   <div class="land-section" id="features">
     <div class="land-section-head reveal">
       <div class="land-section-eyebrow">ฟีเจอร์</div>
-      <div class="land-section-title">ทุกวิธีที่ตารางเรียนเข้ามาในชีวิต Smart Calendar รับมือได้หมด</div>
+      <div class="land-section-title">ทุกวิธีที่ตารางเรียนเข้ามาในชีวิต ClassFlow รับมือได้หมด</div>
     </div>
     <div class="land-features">
       <div class="land-feat reveal"><div class="land-feat-icon">✦</div><div class="land-feat-title">AI จัดตารางอัตโนมัติ</div><div class="land-feat-desc">วางข้อความแบบไหนก็ได้ AI แยกวัน เวลา รหัสวิชา และห้องเรียนให้ถูกต้อง</div></div>
@@ -728,7 +766,7 @@ body,html{font-family:'Sarabun',sans-serif;font-size:14px;background:var(--bg);c
     </div>
   </div>
 
-  <div class="land-foot">Smart Calendar — เครื่องมือจัดตารางเรียนฟรี</div>
+  <div class="land-foot">ClassFlow — เครื่องมือจัดตารางเรียนฟรี</div>
 </div>
 
 <!-- ══════════════════════════════════
@@ -736,13 +774,20 @@ body,html{font-family:'Sarabun',sans-serif;font-size:14px;background:var(--bg);c
 ══════════════════════════════════ -->
 <div class="app hidden" id="app">
   <div class="app-header">
-    <div class="app-logo"><div class="logo-icon">✦</div>Smart Calendar</div>
+    <div class="app-logo"><div class="logo-icon">✦</div>ClassFlow</div>
     <div class="tabs">
       <button class="tab active" onclick="switchTab('monthly')"><i class="ic" data-icon="calendar-month"></i><span class="tab-label-full">ปฏิทิน</span><span class="tab-label-short">ปฏิทิน</span></button>
       <button class="tab" onclick="switchTab('weekly')"><i class="ic" data-icon="layout-grid"></i><span class="tab-label-full">ตารางเรียน</span><span class="tab-label-short">ตาราง</span></button>
       <button class="tab" onclick="switchTab('feed')"><i class="ic" data-icon="feed"></i><span class="tab-label-full">โพสต์</span><span class="tab-label-short">โพสต์</span></button>
       <button class="tab" onclick="switchTab('chat')"><i class="ic" data-icon="message"></i><span class="tab-label-full">แชท</span><span class="tab-label-short">แชท</span></button>
+      <button class="tab" id="tab-friends" onclick="switchTab('friends')"><i class="ic" data-icon="users"></i><span class="tab-label-full">เพื่อน</span><span class="tab-label-short">เพื่อน</span></button>
       <button class="tab" onclick="switchTab('settings')"><i class="ic" data-icon="settings"></i><span class="tab-label-full">ตั้งค่า</span><span class="tab-label-short">ตั้งค่า</span></button>
+    </div>
+    <div class="header-tools">
+      <div class="live-clock" id="liveClock">00:00:00<span class="cs">:00</span></div>
+      <button class="theme-toggle" id="themeToggleBtn" onclick="toggleTheme()" title="สลับโหมดกลางวัน/กลางคืน">
+        <i class="ic" data-icon="moon" id="themeToggleIcon"></i>
+      </button>
     </div>
     <div class="dropdown" id="userDropdown" style="display:none">
       <div class="user-bar" onclick="toggleUserMenu()" style="cursor:pointer">
@@ -987,6 +1032,65 @@ body,html{font-family:'Sarabun',sans-serif;font-size:14px;background:var(--bg);c
     </div>
   </div>
 
+  <!-- ── FRIENDS PANE ── -->
+  <div class="pane" id="pane-friends">
+    <div class="settings-layout" style="max-width:680px">
+      <div style="padding-bottom:4px">
+        <h2 style="font-size:18px;font-weight:700;color:var(--text1)">เพื่อน</h2>
+        <p style="font-size:13px;color:var(--text3);margin-top:4px">เพิ่มเพื่อน แชร์ปฏิทิน และดูตารางเรียนของกันและกัน</p>
+      </div>
+
+      <!-- รหัสของฉัน -->
+      <div class="settings-card">
+        <div class="settings-card-title"><i class="ic" data-icon="share"></i> รหัสแชร์ของฉัน</div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">รหัสของคุณ</div>
+            <div class="settings-row-desc">แจกรหัสนี้ให้เพื่อน เพื่อให้เพื่อนเพิ่มคุณเป็นเพื่อน</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:700;color:var(--blue);letter-spacing:2px" id="friendsPageMyCode">—</span>
+            <button class="btn btn-sm" onclick="copyShareCode()"><i class="ic" data-icon="copy"></i>คัดลอก</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- เพิ่มเพื่อน -->
+      <div class="settings-card">
+        <div class="settings-card-title"><i class="ic" data-icon="plus"></i> เพิ่มเพื่อน</div>
+        <div class="settings-row" style="flex-direction:column;align-items:stretch;gap:10px">
+          <div class="settings-row-label">ใส่รหัสแชร์ของเพื่อน</div>
+          <div style="display:flex;gap:8px">
+            <input class="fi input" id="friendCodeInputPage" placeholder="รหัส 6 ตัวอักษร..." maxlength="6"
+              style="flex:1;font-family:'IBM Plex Mono',monospace;font-size:14px;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg3);color:var(--text1);outline:none;transition:border-color .2s;letter-spacing:1px"
+              onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'"
+              onkeydown="if(event.key==='Enter')sendFriendRequestPage()"/>
+            <button class="btn btn-blue" onclick="sendFriendRequestPage()"><i class="ic" data-icon="plus"></i>ส่งคำขอ</button>
+          </div>
+          <div class="friend-add-status" id="friendAddStatusPage" style="font-size:12px;min-height:18px"></div>
+        </div>
+      </div>
+
+      <!-- คำขอเป็นเพื่อน -->
+      <div class="settings-card" id="friendsPageReqCard" style="display:none">
+        <div class="settings-card-title"><i class="ic" data-icon="bell"></i> คำขอเป็นเพื่อน <span id="friendsPageReqBadge" class="req-badge" style="margin-left:4px;background:var(--red);color:#fff;font-size:10px;padding:1px 6px;border-radius:8px">0</span></div>
+        <div id="friendsPageRequests" style="padding:8px 0"></div>
+      </div>
+
+      <!-- รายชื่อเพื่อน -->
+      <div class="settings-card">
+        <div class="settings-card-title"><i class="ic" data-icon="users"></i> รายชื่อเพื่อน (<span id="friendsPageCount">0</span>)</div>
+        <div id="friendsPageList" style="padding:8px 0"><div class="empty-state" style="padding:16px"><i class="ic" data-icon="users"></i>ยังไม่มีเพื่อน</div></div>
+      </div>
+
+      <!-- แนะนำเพื่อน -->
+      <div class="settings-card">
+        <div class="settings-card-title"><i class="ic" data-icon="users"></i> แนะนำเพื่อน <span id="friendsPageSuggestBadge" style="margin-left:4px;background:var(--blue);color:#fff;font-size:10px;padding:1px 6px;border-radius:8px;font-family:'IBM Plex Mono',monospace">0</span></div>
+        <div id="friendsPageSuggested" style="padding:8px 0"><div class="empty-state" style="padding:16px"><i class="ic" data-icon="users"></i>กำลังโหลด...</div></div>
+      </div>
+    </div>
+  </div>
+
   <!-- ── SETTINGS PANE ── -->
   <div class="pane" id="pane-settings">
     <div class="settings-layout">
@@ -1081,7 +1185,7 @@ body,html{font-family:'Sarabun',sans-serif;font-size:14px;background:var(--bg);c
         </div>
       </div>
 
-      <div style="text-align:center;padding:20px;font-size:11px;color:var(--text3)">Smart Calendar v2.0 • พัฒนาด้วย ❤️</div>
+      <div style="text-align:center;padding:20px;font-size:11px;color:var(--text3)">ClassFlow v2.0 • พัฒนาด้วย ❤️</div>
     </div>
   </div>
 </div>
@@ -1163,7 +1267,7 @@ body,html{font-family:'Sarabun',sans-serif;font-size:14px;background:var(--bg);c
   <div class="auth-card">
     <div class="auth-logo">
       <div class="auth-logo-icon">✦</div>
-      <div><div class="auth-title">Smart Calendar</div><div class="auth-subtitle">เข้าสู่ระบบเพื่อบันทึกข้อมูล</div></div>
+      <div><div class="auth-title">ClassFlow</div><div class="auth-subtitle">เข้าสู่ระบบเพื่อบันทึกข้อมูล</div></div>
     </div>
     <button class="auth-submit" onclick="doGoogleLogin()" style="background:#fff;color:#1f1f1f;display:flex;align-items:center;justify-content:center;gap:10px">
       <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-3.59-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
@@ -1212,6 +1316,8 @@ body,html{font-family:'Sarabun',sans-serif;font-size:14px;background:var(--bg);c
     <div class="friends-list-section">
       <div class="share-label" id="reqSectionLabel" style="display:none">คำขอเป็นเพื่อน <span id="reqCount" class="req-badge">0</span></div>
       <div id="friendRequestsEl"></div>
+      <div class="share-label" style="margin-top:12px">แนะนำเพื่อน <span id="suggestCount" class="req-badge" style="background:var(--blue)">0</span></div>
+      <div id="suggestedFriendsEl"><div class="empty-state" style="padding:12px"><i class="ic" data-icon="users"></i>กำลังโหลด...</div></div>
       <div class="share-label" style="margin-top:12px">รายชื่อเพื่อน (<span id="friendCount">0</span>)</div>
       <div id="friendsListEl"><div class="empty-state" style="padding:16px"><i class="ic" data-icon="users"></i>ยังไม่มีเพื่อน</div></div>
     </div>
@@ -1422,7 +1528,9 @@ const ICONS = {
   'lock':'<rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
   'palette':'<circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01a.507.507 0 0 1 .39-.99H16c3.31 0 6-2.69 6-6C22 6.48 17.52 2 12 2z"/>',
   'database':'<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>',
-  'camera':'<path d="M4 8h2.5l1.5-2.5h8L17.5 8H20a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2z"/><circle cx="12" cy="13.5" r="3.5"/>'
+  'camera':'<path d="M4 8h2.5l1.5-2.5h8L17.5 8H20a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2z"/><circle cx="12" cy="13.5" r="3.5"/>',
+  'sun':'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>',
+  'moon':'<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>'
 };
 function renderIcons(root){
   (root||document).querySelectorAll('i.ic[data-icon]:not([data-rendered])').forEach(el=>{
@@ -1484,8 +1592,8 @@ function applyFriendViewUI(){
   if(monthlyGrid)monthlyGrid.classList.toggle('rail-hidden',ro);
   const sidebar=document.getElementById('weekSidebar');
   if(sidebar)sidebar.style.display=ro?'none':'';
-  // ซ่อน tab โพสต์/แชท/ตั้งค่า ตอนดูปฏิทินเพื่อน
-  const hiddenTabs=['feed','chat','settings'];
+  // ซ่อน tab โพสต์/แชท/ตั้งค่า/เพื่อน ตอนดูปฏิทินเพื่อน
+  const hiddenTabs=['feed','chat','friends','settings'];
   document.querySelectorAll('.tab').forEach((el,i)=>{
     const t=ALL_TABS[i];
     if(hiddenTabs.includes(t))el.style.display=ro?'none':'';
@@ -1498,7 +1606,7 @@ function applyFriendViewUI(){
 }
 
 /* ── TABS ── */
-const ALL_TABS=['monthly','weekly','feed','chat','settings'];
+const ALL_TABS=['monthly','weekly','feed','chat','friends','settings'];
 function switchTab(t){
   document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',ALL_TABS[i]===t));
   document.querySelectorAll('.pane').forEach(el=>el.classList.remove('active'));
@@ -1507,6 +1615,163 @@ function switchTab(t){
   if(t==='weekly'){renderCourseList();renderTimetable();}
   if(t==='chat'){if(currentUser&&!friendsList.length)loadFriendsList().then(()=>renderChatFriends());else renderChatFriends();}
   if(t==='settings') loadSettingsProfile();
+  if(t==='friends') renderFriendsPage();
+}
+function renderFriendsPage(){
+  // sync รหัสแชร์
+  const myCodeEl=document.getElementById('friendsPageMyCode');
+  if(myCodeEl&&currentUser&&currentUser.shareCode) myCodeEl.textContent=currentUser.shareCode;
+  // โหลดรายการเพื่อนแล้วแสดง
+  if(currentUser&&!currentUser.isGuest){
+    loadFriendsList().then(()=>{
+      renderFriendsPageList();
+      loadFriendSuggestions();
+      loadFriendRequestsPage();
+    });
+  }
+}
+function renderFriendsPageList(){
+  const el=document.getElementById('friendsPageList');
+  const countEl=document.getElementById('friendsPageCount');
+  if(!el) return;
+  if(countEl) countEl.textContent=friendsList.length;
+  if(!friendsList.length){el.innerHTML='<div class="empty-state" style="padding:16px"><i class="ic" data-icon="users"></i>ยังไม่มีเพื่อน</div>';renderIcons();return;}
+  el.innerHTML=friendsList.map(f=>{
+    const bg=f.photoURL?`url('${f.photoURL}') center/cover no-repeat`:uidColor(f.uid);
+    const txt=f.photoURL?'':uidInitial(f.displayName);
+    const online=f.online?'<span class="online-dot" style="position:static;display:inline-block;margin-left:5px"></span>':'';
+    return `<div class="settings-row" style="align-items:center;gap:12px">
+      <div style="display:flex;align-items:center;gap:10px;flex:1">
+        <div class="chat-friend-avatar" style="background:${bg};width:36px;height:36px;font-size:14px">${txt}</div>
+        <div>
+          <div style="font-size:13px;font-weight:600;color:var(--text1)">${f.displayName||'ไม่ระบุชื่อ'}${online}</div>
+          <div style="font-size:11px;color:var(--text3);font-family:'IBM Plex Mono',monospace">${f.shareCode||''}</div>
+        </div>
+      </div>
+      <button class="btn btn-sm" onclick="viewFriendCalPage('${f.uid}','${(f.displayName||'').replace(/'/g,"\\'")}')"><i class="ic" data-icon="calendar-month"></i>ดูปฏิทิน</button>
+      <button class="btn btn-sm" onclick="startChatWithFriend('${f.uid}','${(f.displayName||'').replace(/'/g,"\\'")}','${f.shareCode||''}')" style="border-color:rgba(88,166,255,.3)"><i class="ic" data-icon="message"></i>แชท</button>
+      <button class="btn btn-sm" onclick="removeFriendPage('${f.uid}')" style="border-color:rgba(248,81,73,.3);color:var(--red);background:rgba(248,81,73,.08)"><i class="ic" data-icon="x"></i></button>
+    </div>`;
+  }).join('');
+  renderIcons();
+}
+async function removeFriendPage(uid){
+  if(!await scConfirm('ต้องการลบเพื่อนคนนี้?',{title:'ลบเพื่อน',danger:true}))return;
+  try{
+    const {doc,deleteDoc,getFirestore}=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+    const db2=getFirestore();
+    await Promise.all([
+      deleteDoc(doc(db2,'users',currentUser.uid,'friends',uid)),
+      deleteDoc(doc(db2,'users',uid,'friends',currentUser.uid))
+    ]);
+    friendsList=friendsList.filter(f=>f.uid!==uid);
+    renderFriendsPageList();
+    renderChatFriends();
+  }catch(e){scAlertErr('ลบเพื่อนไม่สำเร็จ: '+e.message);}
+}
+window.removeFriendPage=removeFriendPage;
+function viewFriendCalPage(uid,name){
+  switchTab('monthly');
+  setTimeout(()=>viewFriendCalendar&&viewFriendCalendar(uid,name),100);
+}
+window.viewFriendCalPage=viewFriendCalPage;
+function startChatWithFriend(uid,name,code){
+  activeChatFriend={uid,displayName:name,shareCode:code};
+  switchTab('chat');
+  setTimeout(()=>{renderChatFriends();typeof openChat!=='undefined'&&openChat(uid);},300);
+}
+window.startChatWithFriend=startChatWithFriend;
+async function sendFriendRequestPage(){
+  const inp=document.getElementById('friendCodeInputPage');
+  const statusEl=document.getElementById('friendAddStatusPage');
+  const code=(inp?.value||'').trim().toUpperCase();
+  if(!code){statusEl.textContent='กรุณาใส่รหัส';statusEl.style.color='var(--amber)';return;}
+  if(code===currentUser?.shareCode){statusEl.textContent='ไม่สามารถเพิ่มตัวเองเป็นเพื่อนได้';statusEl.style.color='var(--red)';return;}
+  statusEl.textContent='กำลังค้นหา...';statusEl.style.color='var(--text2)';
+  // reuse same logic as sendFriendRequest from modal
+  document.getElementById('friendCodeInput').value=code;
+  await sendFriendRequest();
+  const modalStatus=document.getElementById('friendAddStatus');
+  statusEl.textContent=modalStatus?.textContent||'';
+  statusEl.style.color=modalStatus?.style?.color||'var(--text2)';
+  if(inp) inp.value='';
+}
+window.sendFriendRequestPage=sendFriendRequestPage;
+async function loadFriendRequestsPage(){
+  const reqCard=document.getElementById('friendsPageReqCard');
+  const reqEl=document.getElementById('friendsPageRequests');
+  const badgeEl=document.getElementById('friendsPageReqBadge');
+  if(!reqEl||!currentUser||currentUser.isGuest)return;
+  try{
+    const {collection,getDocs,getFirestore,query,where}=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+    const db2=getFirestore();
+    const snap=await getDocs(query(collection(db2,'friendRequests'),where('to','==',currentUser.uid),where('status','==','pending')));
+    const reqs=snap.docs.map(d=>({id:d.id,...d.data()}));
+    if(badgeEl) badgeEl.textContent=reqs.length;
+    if(reqCard) reqCard.style.display=reqs.length?'':'none';
+    if(!reqs.length){reqEl.innerHTML='';return;}
+    reqEl.innerHTML=reqs.map(r=>`
+      <div class="settings-row" style="gap:10px;align-items:center">
+        <div style="flex:1;font-size:13px;color:var(--text1)">${r.fromName||r.fromCode||r.from}</div>
+        <button class="btn btn-sm btn-blue" onclick="acceptFriendReqPage('${r.id}','${r.from}','${(r.fromName||'').replace(/'/g,"\\'")}','${r.fromCode||''}')"><i class="ic" data-icon="check"></i>ยอมรับ</button>
+        <button class="btn btn-sm" onclick="declineFriendReqPage('${r.id}')" style="border-color:rgba(248,81,73,.3);color:var(--red)"><i class="ic" data-icon="x"></i>ปฏิเสธ</button>
+      </div>`).join('');
+    renderIcons();
+  }catch(e){console.warn('loadFriendRequestsPage:',e);}
+}
+async function acceptFriendReqPage(id,fromUid,fromName,fromCode){
+  document.getElementById('friendRequestsEl').querySelectorAll&&
+    document.getElementById('friendRequestsEl').querySelector(`[data-rid="${id}"]`)?.remove();
+  // reuse modal accept
+  const modalReqEl=document.getElementById('friendRequestsEl');
+  // find and click accept btn in modal if exists, else call Firestore directly
+  try{
+    const {doc,setDoc,deleteDoc,getDoc,getFirestore}=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+    const db2=getFirestore();
+    const meRef=doc(db2,'users',currentUser.uid,'friends',fromUid);
+    const themRef=doc(db2,'users',fromUid,'friends',currentUser.uid);
+    const reqRef=doc(db2,'friendRequests',id);
+    await Promise.all([
+      setDoc(meRef,{uid:fromUid,displayName:fromName,shareCode:fromCode,addedAt:Date.now()}),
+      setDoc(themRef,{uid:currentUser.uid,displayName:currentUser.displayName,shareCode:currentUser.shareCode,addedAt:Date.now()}),
+      deleteDoc(reqRef)
+    ]);
+    await loadFriendsList();
+    renderFriendsPageList();
+    loadFriendRequestsPage();
+    renderChatFriends();
+    scAlertOk('เพิ่มเพื่อนสำเร็จแล้ว!',{title:'สำเร็จ'});
+  }catch(e){scAlertErr('เกิดข้อผิดพลาด: '+e.message);}
+}
+async function declineFriendReqPage(id){
+  try{
+    const {doc,deleteDoc,getFirestore}=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+    const db2=getFirestore();
+    await deleteDoc(doc(db2,'friendRequests',id));
+    loadFriendRequestsPage();
+  }catch(e){console.warn(e);}
+}
+window.acceptFriendReqPage=acceptFriendReqPage;
+window.declineFriendReqPage=declineFriendReqPage;
+async function loadFriendSuggestions(){
+  const el=document.getElementById('friendsPageSuggested');
+  const badge=document.getElementById('friendsPageSuggestBadge');
+  const suggestEl=document.getElementById('suggestedFriendsEl');
+  // trigger existing suggest load
+  if(suggestEl&&suggestEl.innerHTML.includes('กำลังโหลด')||!suggestEl?.children?.length){
+    // call the modal version which populates suggestedFriendsEl
+    await loadSuggestedFriends&&loadSuggestedFriends();
+  }
+  // mirror data from modal element to page element
+  if(el&&suggestEl){
+    setTimeout(()=>{
+      el.innerHTML=suggestEl.innerHTML||'<div class="empty-state" style="padding:16px"><i class="ic" data-icon="users"></i>ไม่มีคำแนะนำ</div>';
+      const cnt=el.querySelectorAll('.parsed-item,.settings-row,.friend-req-item').length||
+                document.getElementById('suggestCount')?.textContent||'0';
+      if(badge) badge.textContent=cnt;
+      renderIcons();
+    },800);
+  }
 }
 
 /* ── CHAR COUNT ── */
@@ -1712,7 +1977,7 @@ function renderDayPanel(){
         <td><span class="cdp-cat-dot" style="background:${catColor(ev.cat)}"></span><span class="cdp-ev-name">${ev.text}</span></td>
         <td><span class="cdp-ev-time">${ev.time||'–'}</span></td>
         <td><span class="cdp-ev-name" style="color:var(--text3);font-size:11px">${CAT_LABELS[ev.cat]||'ทั่วไป'}</span></td>
-        <td>${ro?'':`<button class="cdp-del-btn" onclick="cdpDel(${ev.id})"><i class="ic" data-icon="trash"></i></button>`}</td>
+        <td>${ro?`<button class="cdp-del-btn" onclick="copyFriendEvent(${ev.id})" style="color:var(--teal)" title="คัดลอกไปปฏิทินของฉัน"><i class="ic" data-icon="copy"></i></button>`:`<button class="cdp-del-btn" onclick="cdpDel(${ev.id})"><i class="ic" data-icon="trash"></i></button>`}</td>
       </tr>`).join('')
     : `<tr><td colspan="4" style="text-align:center;color:var(--text3);padding:14px;font-size:12px">ไม่มีกิจกรรม</td></tr>`;
   document.getElementById('cdpAddRow').style.display=ro?'none':'';
@@ -1765,7 +2030,7 @@ function renderEventList(){
         <span class="ev-cat-chip cat-${ev.cat||'other'}">${CAT_LABELS[ev.cat]||'ทั่วไป'}</span>
       </div>
     </div>
-    ${ro?'':`<button class="ev-del" onclick="showEventModal(${ev.id})" style="color:var(--blue)"><i class="ic" data-icon="pencil"></i></button>`}
+    ${ro?`<button class="ev-del" onclick="copyFriendEvent(${ev.id})" style="color:var(--teal)" title="คัดลอกไปปฏิทินของฉัน"><i class="ic" data-icon="copy"></i></button>`:`<button class="ev-del" onclick="showEventModal(${ev.id})" style="color:var(--blue)"><i class="ic" data-icon="pencil"></i></button>`}
   </div>`).join('');
 }
 async function delEvent(id){if(isViewingFriend())return;if(!await scConfirm('ลบกิจกรรมนี้?',{title:'ยืนยันการลบ',danger:true}))return;events=events.filter(e=>Number(e.id)!==Number(id));renderCalendar();renderEventList();updateStats();saveUserData();}
@@ -1794,6 +2059,67 @@ function parseTimeRange(str){
   if(r)return{start:r[1].padStart(2,'0')+':'+r[2],end:r[3].padStart(2,'0')+':'+r[4]};return null;
 }
 function norm(t){const p=t.match(/^(\d{1,2}):?(\d{2})?$/);return p?p[1].padStart(2,'0')+':'+(p[2]||'00'):t;}
+
+/* ── COPY FROM FRIEND (ตรวจทับซ้อนกับตารางของเรา) ── */
+function timeToMin(t){if(!t)return null;const m=String(t).match(/^(\d{1,2}):(\d{2})/);if(!m)return null;return Number(m[1])*60+Number(m[2]);}
+function rangesOverlap(s1,e1,s2,e2){return s1<e2&&s2<e1;}
+function findEventConflicts(date,time){
+  const conflicts=[];
+  if(!date)return conflicts;
+  const dow=new Date(date.y,date.m-1,date.d).getDay();
+  const tMin=timeToMin(time);
+  events.forEach(e=>{
+    if(e.date&&e.date.d===date.d&&e.date.m===date.m&&e.date.y===date.y){
+      if(tMin===null||e.time===undefined||e.time===''||timeToMin(e.time)===tMin){
+        conflicts.push(`กิจกรรม "${e.text}"${e.time?' เวลา '+e.time:''}`);
+      }
+    }
+  });
+  if(tMin!==null){
+    courses.forEach(c=>{
+      if(c.day===dow){
+        const cs=timeToMin(c.start),ce=timeToMin(c.end);
+        if(cs!==null&&ce!==null&&tMin>=cs&&tMin<ce)conflicts.push(`วิชา ${c.code} (${c.start}-${c.end})`);
+      }
+    });
+  }
+  return conflicts;
+}
+function findCourseConflicts(day,start,end){
+  const conflicts=[];
+  const s=timeToMin(start),e=timeToMin(end);
+  if(s===null||e===null)return conflicts;
+  courses.forEach(c=>{
+    if(c.day===day&&rangesOverlap(s,e,timeToMin(c.start),timeToMin(c.end)))conflicts.push(`${c.code} (${c.start}-${c.end})`);
+  });
+  return conflicts;
+}
+async function copyFriendEvent(id){
+  const src=(viewState.friendEvents||[]).find(e=>Number(e.id)===Number(id));
+  if(!src)return;
+  const conflicts=findEventConflicts(src.date,src.time);
+  if(conflicts.length){
+    const ok=await scConfirm(`เวลานี้ของคุณไม่ว่าง ทับกับ:\n${conflicts.join('\n')}\n\nต้องการเพิ่มกิจกรรมนี้อยู่ดีไหม?`,{title:'เวลาทับซ้อน',danger:true});
+    if(!ok)return;
+  }
+  events.push({id:Date.now(),text:src.text,date:{...src.date},time:src.time||'',cat:src.cat||'other',note:src.note||''});
+  saveUserData();renderCalendar();renderEventList();updateStats();if(selDate)renderDayPanel();
+  scAlertOk('คัดลอกกิจกรรมไปยังปฏิทินของคุณแล้ว',{title:'สำเร็จ'});
+}
+window.copyFriendEvent=copyFriendEvent;
+async function copyFriendCourse(id){
+  const src=(viewState.friendCourses||[]).find(c=>Number(c.id)===Number(id));
+  if(!src)return;
+  const conflicts=findCourseConflicts(src.day,src.start,src.end);
+  if(conflicts.length){
+    const ok=await scConfirm(`เวลานี้ของคุณไม่ว่าง ทับกับวิชา:\n${conflicts.join('\n')}\n\nต้องการเพิ่มวิชานี้อยู่ดีไหม?`,{title:'เวลาทับซ้อน',danger:true});
+    if(!ok)return;
+  }
+  courses.push({id:Date.now(),code:src.code,name:src.name||'',day:src.day,start:norm(src.start),end:norm(src.end),room:src.room||'',group:src.group||'',color:src.color||PALETTE[courses.length%PALETTE.length]});
+  saveUserData();renderCourseList();renderTimetable();renderCourseListView();
+  scAlertOk('คัดลอกวิชาไปยังตารางของคุณแล้ว',{title:'สำเร็จ'});
+}
+window.copyFriendCourse=copyFriendCourse;
 
 function addCourse(){
   const code=document.getElementById('ci-code').value.trim();
@@ -1835,7 +2161,7 @@ function renderCourseList(){
   el.innerHTML=src.map(c=>`<div class="course-chip">
     <div class="chip-accent" style="background:${c.color}"></div>
     <div class="chip-info"><div class="chip-code">${c.code}</div><div class="chip-meta">${DAY_FULL[c.day]} ${c.start}–${c.end}${c.room?' · '+c.room:''}</div></div>
-    ${ro?'':`<button class="chip-del" onclick="delCourse(${c.id})"><i class="ic" data-icon="x"></i></button>`}
+    ${ro?`<button class="chip-del" onclick="copyFriendCourse(${c.id})" style="color:var(--teal)" title="คัดลอกไปตารางของฉัน"><i class="ic" data-icon="copy"></i></button>`:`<button class="chip-del" onclick="delCourse(${c.id})"><i class="ic" data-icon="x"></i></button>`}
   </div>`).join('');
   const totalMin=src.reduce((sum,c)=>{const[sh,sm]=c.start.split(':').map(Number);const[eh,em]=c.end.split(':').map(Number);return sum+(eh*60+em-sh*60-sm);},0);
   stats.textContent=`${src.length} วิชา · ${(totalMin/60).toFixed(1)} ชม./สัปดาห์`;
@@ -1851,12 +2177,12 @@ function renderCourseListView(){
   const mode=window._sortMode||'day';
   const DAY_ORDER=[1,2,3,4,5,6,0];
   const ro=isViewingFriend();
-  let html=`<table class="course-list-table"><thead><tr><th>รหัสวิชา</th><th>เวลา</th><th class="clt-hide-xs">ห้อง</th><th class="clt-hide-xs">กลุ่ม</th>${ro?'':'<th style="width:36px"></th>'}</tr></thead><tbody>`;
+  let html=`<table class="course-list-table"><thead><tr><th>รหัสวิชา</th><th>เวลา</th><th class="clt-hide-xs">ห้อง</th><th class="clt-hide-xs">กลุ่ม</th><th style="width:36px"></th></tr></thead><tbody>`;
   if(mode==='day'){
     DAY_ORDER.forEach(d=>{
       const dayCourses=src.filter(c=>c.day===d).sort((a,b)=>a.start.localeCompare(b.start));
       if(!dayCourses.length)return;
-      html+=`<tr class="clt-day-row"><td colspan="${ro?4:5}">📅 ${DAY_FULL[d]}</td></tr>`;
+      html+=`<tr class="clt-day-row"><td colspan="5">📅 ${DAY_FULL[d]}</td></tr>`;
       dayCourses.forEach(c=>{
         html+=`<tr>
           <td><span class="clt-color-dot" style="background:${c.color}"></span><span class="clt-code">${c.code}</span>${c.name?`<br><span style="font-size:11px;color:var(--text2);margin-left:14px">${c.name}</span>`:''}
@@ -1865,7 +2191,7 @@ function renderCourseListView(){
           <td class="clt-time">${c.start}–${c.end}</td>
           <td class="clt-room clt-hide-xs">${c.room||'–'}</td>
           <td class="clt-group clt-hide-xs">${c.group||'–'}</td>
-          ${ro?'':`<td style="text-align:center;padding:4px"><button onclick="showCourseModal(${c.id})" style="background:none;border:none;cursor:pointer;color:var(--blue);padding:4px;border-radius:4px" title="แก้ไข"><i class="ic" data-icon="pencil"></i></button></td>`}
+          ${ro?`<td style="text-align:center;padding:4px"><button onclick="copyFriendCourse(${c.id})" style="background:none;border:none;cursor:pointer;color:var(--teal);padding:4px;border-radius:4px" title="คัดลอกไปตารางของฉัน"><i class="ic" data-icon="copy"></i></button></td>`:`<td style="text-align:center;padding:4px"><button onclick="showCourseModal(${c.id})" style="background:none;border:none;cursor:pointer;color:var(--blue);padding:4px;border-radius:4px" title="แก้ไข"><i class="ic" data-icon="pencil"></i></button></td>`}
         </tr>`;
       });
     });
@@ -1874,7 +2200,7 @@ function renderCourseListView(){
     let lastCode='';
     sorted.forEach(c=>{
       if(c.code!==lastCode){
-        html+=`<tr class="clt-day-row"><td colspan="${ro?4:5}"><span class="clt-color-dot" style="background:${c.color}"></span>${c.code}${c.name?` — ${c.name}`:''}</td></tr>`;
+        html+=`<tr class="clt-day-row"><td colspan="5"><span class="clt-color-dot" style="background:${c.color}"></span>${c.code}${c.name?` — ${c.name}`:''}</td></tr>`;
         lastCode=c.code;
       }
       html+=`<tr>
@@ -1882,7 +2208,7 @@ function renderCourseListView(){
         <td class="clt-time">${c.start}–${c.end}</td>
         <td class="clt-room clt-hide-xs">${c.room||'–'}</td>
         <td class="clt-group clt-hide-xs">${c.group||'–'}</td>
-        ${ro?'':`<td style="text-align:center;padding:4px"><button onclick="showCourseModal(${c.id})" style="background:none;border:none;cursor:pointer;color:var(--blue);padding:4px;border-radius:4px" title="แก้ไข"><i class="ic" data-icon="pencil"></i></button></td>`}
+        ${ro?`<td style="text-align:center;padding:4px"><button onclick="copyFriendCourse(${c.id})" style="background:none;border:none;cursor:pointer;color:var(--teal);padding:4px;border-radius:4px" title="คัดลอกไปตารางของฉัน"><i class="ic" data-icon="copy"></i></button></td>`:`<td style="text-align:center;padding:4px"><button onclick="showCourseModal(${c.id})" style="background:none;border:none;cursor:pointer;color:var(--blue);padding:4px;border-radius:4px" title="แก้ไข"><i class="ic" data-icon="pencil"></i></button></td>`}
       </tr>`;
     });
   }
@@ -1940,7 +2266,8 @@ function renderTimetable(){
       const widthPct=((e-s)/spanMin)*100;
       for(let i=colStart;i<colStart+colSpan&&i<row.length;i++){
         if(i===colStart){
-          row[i].content=`<div class="tt-block" style="background:${c.color};left:0;right:0;width:auto"${ro?'':` onclick="showCourseModal(${c.id})"`}>
+          row[i].content=`<div class="tt-block" style="background:${c.color};left:0;right:0;width:auto" onclick="${ro?`copyFriendCourse(${c.id})`:`showCourseModal(${c.id})`}" title="${ro?'คัดลอกไปตารางของฉัน':''}">
+            ${ro?`<div class="tb-copy-badge"><i class="ic" data-icon="copy"></i></div>`:''}
             <div class="tb-code">${c.code}</div>
             ${c.group?`<div class="tb-group">(${c.group})</div>`:''}
             ${c.room?`<div class="tb-room">${c.room}</div>`:''}
@@ -2294,7 +2621,7 @@ function openFriendsModal(){
   document.getElementById('friendAddStatus').textContent='';
   document.getElementById('friendsModal').classList.remove('hidden');
   processAcceptedRequests();
-  loadFriendsList();
+  loadFriendsList().then(loadSuggestedFriends);
   loadFriendRequests();
 }
 window.openFriendsModal=openFriendsModal;
@@ -2425,6 +2752,51 @@ async function loadFriendsList(){
   }).join('');renderIcons(listEl);
 }
 
+/* ── แนะนำเพื่อน (Suggested friends) ── */
+async function loadSuggestedFriends(){
+  const el=document.getElementById('suggestedFriendsEl');
+  const countEl=document.getElementById('suggestCount');
+  if(!el||!currentUser||currentUser.isGuest)return;
+  try{
+    const snap=await getDocs(collection(db,'userCodes'));
+    const friendUids=new Set(friendsList.map(f=>f.uid));
+    const candidates=snap.docs
+      .map(d=>({shareCode:d.id,...d.data()}))
+      .filter(u=>u.uid&&u.uid!==currentUser.uid&&!friendUids.has(u.uid))
+      .sort((a,b)=>(a.displayName||'').localeCompare(b.displayName||''))
+      .slice(0,40);
+    if(countEl)countEl.textContent=candidates.length;
+    if(!candidates.length){el.innerHTML='<div class="empty-state" style="padding:12px"><i class="ic" data-icon="users"></i>ยังไม่มีคนแนะนำตอนนี้</div>';renderIcons(el);return;}
+    el.innerHTML=candidates.map(u=>`<div class="friend-row">
+      <div class="friend-avatar" style="background:${avatarBg(u.uid,u.photoURL)}">${avatarTxt(u.displayName,u.photoURL)}</div>
+      <div class="friend-info"><div class="friend-name">${u.displayName||'ไม่ทราบชื่อ'}</div><div class="friend-meta">รหัส ${u.shareCode}</div></div>
+      <button class="friend-view-btn" onclick="quickAddFriend('${u.uid}',this)">+ เพิ่มเพื่อน</button>
+    </div>`).join('');
+    renderIcons(el);
+  }catch(e){
+    console.warn('loadSuggestedFriends:',e);
+    el.innerHTML='<div class="empty-state" style="padding:12px;font-size:11px;line-height:1.7">ยังแนะนำเพื่อนไม่ได้ในตอนนี้</div>';
+    if(countEl)countEl.textContent='0';
+  }
+}
+window.loadSuggestedFriends=loadSuggestedFriends;
+
+async function quickAddFriend(uid,btn){
+  if(!currentUser||currentUser.isGuest||!uid)return;
+  if(btn){btn.disabled=true;btn.textContent='กำลังส่ง...';}
+  try{
+    await setDoc(doc(db,'friendRequests',uid,'incoming',currentUser.uid),{
+      fromUid:currentUser.uid,fromName:currentUser.displayName,fromShareCode:currentUser.shareCode,fromPhoto:currentUser.photoURL||null,
+      toUid:uid,sentAt:Date.now()
+    });
+    if(btn){btn.textContent='✓ ส่งคำขอแล้ว';btn.classList.add('sent');}
+  }catch(e){
+    if(btn){btn.disabled=false;btn.textContent='+ เพิ่มเพื่อน';}
+    scAlertErr('ส่งคำขอไม่สำเร็จ: '+e.message);
+  }
+}
+window.quickAddFriend=quickAddFriend;
+
 async function viewFriendCalendar(uid){
   const friend=friendsList.find(f=>f.uid===uid);if(!friend)return;
   try{
@@ -2540,7 +2912,7 @@ async function renderFeed(){
           if(change.type==='added'){
             const post=change.doc.data();
             if(post.authorUid&&post.authorUid!==currentUser?.uid){
-              const n=new Notification('Smart Calendar — โพสต์ใหม่',{
+              const n=new Notification('ClassFlow — โพสต์ใหม่',{
                 body:`${post.authorName||'ใครบางคน'}: ${post.text?post.text.slice(0,60):'แชร์รูปภาพ'}`,
                 icon:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjNThhNmZmIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjYmM4Y2ZmIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9InVybCgjZykiLz48L3N2Zz4='
               });
@@ -2762,7 +3134,7 @@ async function openChat(uid){
         if(change.type==='added'){
           const msg=change.doc.data();
           if(msg.senderUid&&msg.senderUid!==currentUser?.uid){
-            const n=new Notification('Smart Calendar — ข้อความใหม่',{
+            const n=new Notification('ClassFlow — ข้อความใหม่',{
               body:`${msg.senderName||'เพื่อน'}: ${msg.text||'ส่งรูปภาพ'}`,
               icon:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjNThhNmZmIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjYmM4Y2ZmIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9InVybCgjZykiLz48L3N2Zz4='
             });
@@ -2961,7 +3333,7 @@ function startEventNotifChecker(){
         ev.time?+ev.time.split(':')[0]:8,ev.time?+ev.time.split(':')[1]||0:0);
       const diff=(evDate-now)/60000; // minutes
       if(diff>0&&diff<=15&&diff>14){
-        const n=new Notification('Smart Calendar',{
+        const n=new Notification('ClassFlow',{
           body:`⏰ "${ev.text}" จะเริ่มใน 15 นาที`,
           icon:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjNThhNmZmIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjYmM4Y2ZmIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9InVybCgjZykiLz48L3N2Zz4='
         });
@@ -3160,8 +3532,40 @@ Object.assign(window,{
   switchTab,updateCharCount,doParse,addEvent,renderParsed,
   selectDate,prevMonth,nextMonth,goToday,setCalView,delEvent,
   pickColor,addCourse,parseBulk,delCourse,clearAllCourses,
-  showCourseModal,closeModal,showEventModal,closeEventModal,exportSchedule,previewFeedImages
+  showCourseModal,closeModal,showEventModal,closeEventModal,exportSchedule,previewFeedImages,
+  renderFriendsPage,renderFriendsPageList
 });
+
+/* ── THEME (กลางวัน/กลางคืน) ── */
+function applyThemeIcon(){
+  const isLight=document.body.classList.contains('theme-light');
+  const icon=document.getElementById('themeToggleIcon');
+  if(icon){icon.setAttribute('data-icon',isLight?'sun':'moon');icon.removeAttribute('data-rendered');renderIcons();}
+  const btn=document.getElementById('themeToggleBtn');
+  if(btn)btn.title=isLight?'สลับเป็นโหมดกลางคืน':'สลับเป็นโหมดกลางวัน';
+}
+function toggleTheme(){
+  const isLight=document.body.classList.toggle('theme-light');
+  try{localStorage.setItem('cf_theme',isLight?'light':'dark');}catch(e){}
+  applyThemeIcon();
+}
+window.toggleTheme=toggleTheme;
+applyThemeIcon();
+
+/* ── LIVE CLOCK (ชม:นาที:วินาที:เสี้ยววินาที) ── */
+function tickClock(){
+  const el=document.getElementById('liveClock');
+  if(el){
+    const now=new Date();
+    const hh=String(now.getHours()).padStart(2,'0');
+    const mm=String(now.getMinutes()).padStart(2,'0');
+    const ss=String(now.getSeconds()).padStart(2,'0');
+    const cs=String(Math.floor(now.getMilliseconds()/10)).padStart(2,'0');
+    el.innerHTML=`${hh}:${mm}:${ss}<span class="cs">:${cs}</span>`;
+  }
+  requestAnimationFrame(tickClock);
+}
+tickClock();
 
 /* ── INIT ── */
 buildColorPicker();
