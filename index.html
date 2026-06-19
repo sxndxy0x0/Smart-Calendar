@@ -187,6 +187,7 @@ body,html{font-family:'Sarabun',sans-serif;font-size:14px;background:var(--bg);c
 .fi{display:flex;flex-direction:column;gap:3px}
 .fi label{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
 .fi input,.fi select{font-family:'Sarabun',sans-serif;font-size:12px;padding:7px 9px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg3);color:var(--text1);width:100%;transition:border-color .2s}
+.fi input[type=time],.fi input[type=date]{color-scheme:dark}
 .fi input:focus,.fi select:focus{outline:none;border-color:var(--blue)}
 .fi input::placeholder{color:var(--text3)}
 .time-pair{display:flex;align-items:center;gap:4px}
@@ -540,7 +541,11 @@ body,html{font-family:'Sarabun',sans-serif;font-size:14px;background:var(--bg);c
 .settings-select{font-family:'Sarabun',sans-serif;font-size:12px;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg3);color:var(--text1);outline:none}
 .settings-select:focus{border-color:var(--blue)}
 .settings-avatar-row{display:flex;align-items:center;gap:14px}
-.settings-avatar-circle{width:48px;height:48px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:20px}
+.settings-avatar-circle{width:48px;height:48px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:20px;background-size:cover;background-position:center}
+.settings-avatar-wrap{position:relative;cursor:pointer;flex-shrink:0;border-radius:50%}
+.settings-avatar-wrap:hover .settings-avatar-circle{filter:brightness(.85)}
+.settings-avatar-edit{position:absolute;bottom:-2px;right:-2px;width:18px;height:18px;border-radius:50%;background:var(--blue);border:2px solid var(--bg2);display:flex;align-items:center;justify-content:center;color:#fff;pointer-events:none}
+.settings-avatar-edit svg{width:10px;height:10px}
 
 /* ── LIGHTBOX ── */
 .lightbox{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:300;display:flex;align-items:center;justify-content:center;cursor:zoom-out}
@@ -888,9 +893,9 @@ body,html{font-family:'Sarabun',sans-serif;font-size:14px;background:var(--bg);c
               <div class="fi"><label>กลุ่มเรียน</label><input id="ci-group" placeholder="เช่น 1"/></div>
               <div class="fi"><label>เวลา</label>
                 <div class="time-pair">
-                  <input id="ci-start" placeholder="08:00" style="width:55px"/>
+                  <input id="ci-start" type="time" style="width:92px"/>
                   <span class="time-sep">—</span>
-                  <input id="ci-end" placeholder="10:00" style="width:55px"/>
+                  <input id="ci-end" type="time" style="width:92px"/>
                 </div>
               </div>
             </div>
@@ -995,7 +1000,11 @@ body,html{font-family:'Sarabun',sans-serif;font-size:14px;background:var(--bg);c
         <div class="settings-card-title"><i class="ic" data-icon="user"></i> บัญชีผู้ใช้</div>
         <div class="settings-row">
           <div class="settings-avatar-row">
-            <div class="settings-avatar-circle" id="settingsAvatarCircle">U</div>
+            <div class="settings-avatar-wrap" onclick="pickProfilePhoto()" title="เปลี่ยนรูปโปรไฟล์">
+              <div class="settings-avatar-circle" id="settingsAvatarCircle">U</div>
+              <div class="settings-avatar-edit"><i class="ic" data-icon="camera"></i></div>
+            </div>
+            <input type="file" id="profilePhotoInput" accept="image/*" style="display:none" onchange="onProfilePhotoSelected(event)"/>
             <div>
               <div style="font-weight:600;color:var(--text1);font-size:14px" id="settingsNameEl">ผู้ใช้</div>
               <div style="font-size:12px;color:var(--text3)" id="settingsEmailEl">-</div>
@@ -1003,6 +1012,8 @@ body,html{font-family:'Sarabun',sans-serif;font-size:14px;background:var(--bg);c
             </div>
           </div>
           <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+            <button class="btn btn-sm" onclick="pickProfilePhoto()"><i class="ic" data-icon="camera"></i>เปลี่ยนรูป</button>
+            <button class="btn btn-sm" id="removePhotoBtn" style="display:none" onclick="removeProfilePhoto()"><i class="ic" data-icon="x"></i>ลบรูป</button>
             <button class="btn btn-sm" onclick="editDisplayName()"><i class="ic" data-icon="edit"></i>แก้ชื่อ</button>
             <button class="btn btn-sm" style="border-color:rgba(248,81,73,.3);color:var(--red);background:rgba(248,81,73,.08)" onclick="doLogout()">ออกจากระบบ</button>
           </div>
@@ -1100,9 +1111,9 @@ body,html{font-family:'Sarabun',sans-serif;font-size:14px;background:var(--bg);c
           <div class="fi"><label>กลุ่มเรียน</label><input id="em-group" placeholder="1"/></div>
           <div class="fi"><label>เวลา</label>
             <div class="time-pair">
-              <input id="em-start" placeholder="08:00" style="width:55px"/>
+              <input id="em-start" type="time" style="width:92px"/>
               <span class="time-sep">—</span>
-              <input id="em-end" placeholder="10:00" style="width:55px"/>
+              <input id="em-end" type="time" style="width:92px"/>
             </div>
           </div>
         </div>
@@ -1126,7 +1137,7 @@ body,html{font-family:'Sarabun',sans-serif;font-size:14px;background:var(--bg);c
         <div class="fi"><label>ชื่อกิจกรรม</label><input id="evm-text" placeholder="ชื่อกิจกรรม"/></div>
         <div class="form-row">
           <div class="fi"><label>วันที่</label><input id="evm-date" type="date"/></div>
-          <div class="fi"><label>เวลา (ไม่บังคับ)</label><input id="evm-time" placeholder="09:00"/></div>
+          <div class="fi"><label>เวลา (ไม่บังคับ)</label><input id="evm-time" type="time"/></div>
         </div>
         <div class="fi"><label>หมวดหมู่</label>
           <select id="evm-cat">
@@ -1410,7 +1421,8 @@ const ICONS = {
   'bell':'<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>',
   'lock':'<rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
   'palette':'<circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01a.507.507 0 0 1 .39-.99H16c3.31 0 6-2.69 6-6C22 6.48 17.52 2 12 2z"/>',
-  'database':'<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>'
+  'database':'<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>',
+  'camera':'<path d="M4 8h2.5l1.5-2.5h8L17.5 8H20a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2z"/><circle cx="12" cy="13.5" r="3.5"/>'
 };
 function renderIcons(root){
   (root||document).querySelectorAll('i.ic[data-icon]:not([data-rendered])').forEach(el=>{
@@ -1459,6 +1471,8 @@ const USER_COLORS=['#58a6ff','#39d353','#bc8cff','#d29922','#f85149'];
 
 function uidColor(uid){return USER_COLORS[(uid||'').charCodeAt(0)%USER_COLORS.length];}
 function uidInitial(name){return (name||'?')[0].toUpperCase();}
+function avatarBg(uid,photoURL){return photoURL?`url('${photoURL}') center/cover no-repeat`:uidColor(uid);}
+function avatarTxt(name,photoURL){return photoURL?'':uidInitial(name);}
 function activeEvents(){return viewState.active==='friend'?viewState.friendEvents:events;}
 function activeCourses(){return viewState.active==='friend'?viewState.friendCourses:courses;}
 function isViewingFriend(){return viewState.active==='friend';}
@@ -1953,8 +1967,8 @@ function showCourseModal(id){
   document.getElementById('em-day').value=c.day;
   document.getElementById('em-room').value=c.room||'';
   document.getElementById('em-group').value=c.group||'';
-  document.getElementById('em-start').value=c.start||'';
-  document.getElementById('em-end').value=c.end||'';
+  document.getElementById('em-start').value=norm(c.start||'');
+  document.getElementById('em-end').value=norm(c.end||'');
   _emColor=c.color||PALETTE[0];
   const cp=document.getElementById('em-colorPicker');
   cp.innerHTML=PALETTE.map(col=>`<div class="color-swatch${col===_emColor?' active':''}" style="background:${col}" onclick="setEmColor('${col}')"></div>`).join('');
@@ -1991,7 +2005,7 @@ function showEventModal(id){
   document.getElementById('evm-text').value=ev.text||'';
   if(ev.date){const pad=n=>String(n).padStart(2,'0');document.getElementById('evm-date').value=`${ev.date.y}-${pad(ev.date.m)}-${pad(ev.date.d)}`;}
   else{document.getElementById('evm-date').value='';}
-  document.getElementById('evm-time').value=ev.time||'';
+  document.getElementById('evm-time').value=norm(ev.time||'');
   document.getElementById('evm-cat').value=ev.cat||'other';
   document.getElementById('evm-note').value=ev.note||'';
   document.getElementById('evModalDelBtn').onclick=()=>{delEvent(id);closeEventModal();};
@@ -2110,6 +2124,7 @@ onAuthStateChanged(auth,async user=>{
     document.getElementById('app').classList.remove('hidden');
     updateUserBar();
     await loadUserProfile();
+    updateUserBar();
     // บันทึก shareCode mapping เพื่อให้คนอื่นส่งคำขอได้
     try{await setDoc(doc(db,'userCodes',currentUser.shareCode),{uid:currentUser.uid,displayName:currentUser.displayName},{merge:true});}catch(e){console.warn('userCodes:',e);}
     subscribeUserData();
@@ -2128,12 +2143,12 @@ onAuthStateChanged(auth,async user=>{
 function updateUserBar(){
   if(!currentUser)return;
   document.getElementById('userDropdown').style.display='';
-  document.getElementById('userAvatar').style.background=uidColor(currentUser.uid);
-  document.getElementById('userAvatar').textContent=uidInitial(currentUser.displayName);
+  document.getElementById('userAvatar').style.background=avatarBg(currentUser.uid,currentUser.photoURL);
+  document.getElementById('userAvatar').textContent=avatarTxt(currentUser.displayName,currentUser.photoURL);
   document.getElementById('userNameDisplay').textContent=currentUser.displayName||'ผู้ใช้';
   document.getElementById('userRoleDisplay').textContent=currentUser.email;
-  document.getElementById('feedAvatar').textContent=uidInitial(currentUser.displayName);
-  document.getElementById('feedAvatar').style.background=uidColor(currentUser.uid);
+  document.getElementById('feedAvatar').textContent=avatarTxt(currentUser.displayName,currentUser.photoURL);
+  document.getElementById('feedAvatar').style.background=avatarBg(currentUser.uid,currentUser.photoURL);
 }
 
 function toggleUserMenu(){document.getElementById('userMenu').classList.toggle('open');}
@@ -2147,7 +2162,7 @@ document.addEventListener('click',e=>{
 async function loadUserProfile(){
   try{
     const snap=await getDoc(doc(db,'users',currentUser.uid,'profile','settings'));
-    if(snap.exists()){const d=snap.data();currentUser.shareEnabled=d.shareEnabled||false;currentUser.shareCourses=d.shareCourses||false;}
+    if(snap.exists()){const d=snap.data();currentUser.shareEnabled=d.shareEnabled||false;currentUser.shareCourses=d.shareCourses||false;currentUser.photoURL=d.photoURL||null;}
   }catch(e){console.warn(e);}
 }
 
@@ -2209,9 +2224,15 @@ function saveUserData(){
 // บันทึกทันทีก่อนออกจากหน้า/สลับแท็บ เพื่อไม่ให้การแก้ไขล่าสุดตกหายไปเพราะ debounce ยังไม่ทันยิง
 window.addEventListener('beforeunload',()=>{
   if(_saveTimer){clearTimeout(_saveTimer);_saveTimer=null;if(currentUser&&!currentUser.isGuest)_doSaveUserData();}
+  if(currentUser&&!currentUser.isGuest&&appSettings.privOnline)updateOnlineStatus(false);
 });
 document.addEventListener('visibilitychange',()=>{
-  if(document.visibilityState==='hidden'&&_saveTimer){clearTimeout(_saveTimer);_saveTimer=null;if(currentUser&&!currentUser.isGuest)_doSaveUserData();}
+  if(document.visibilityState==='hidden'){
+    if(_saveTimer){clearTimeout(_saveTimer);_saveTimer=null;if(currentUser&&!currentUser.isGuest)_doSaveUserData();}
+    if(currentUser&&!currentUser.isGuest&&appSettings.privOnline)updateOnlineStatus(false);
+  }else if(document.visibilityState==='visible'){
+    if(currentUser&&!currentUser.isGuest&&appSettings.privOnline)updateOnlineStatus(true);
+  }
 });
 
 /* ── SHARE ── */
@@ -2286,7 +2307,7 @@ async function sendFriendRequest(){
     const targetUid=data.uid;
     // ส่งคำขอไปยัง target (ไม่ต้องอ่าน friendRequests ของคนอื่น)
     await setDoc(doc(db,'friendRequests',targetUid,'incoming',currentUser.uid),{
-      fromUid:currentUser.uid,fromName:currentUser.displayName,fromShareCode:currentUser.shareCode,
+      fromUid:currentUser.uid,fromName:currentUser.displayName,fromShareCode:currentUser.shareCode,fromPhoto:currentUser.photoURL||null,
       toUid:targetUid,sentAt:Date.now()
     });
     status.style.color='var(--teal)';status.textContent=`✓ ส่งคำขอเป็นเพื่อนหา "${data.displayName}" แล้ว รอการตอบรับ`;
@@ -2306,7 +2327,7 @@ async function loadFriendRequests(){
     if(!reqs.length){if(labelEl)labelEl.style.display='none';reqEl.innerHTML='';return;}
     if(labelEl){labelEl.style.display='';if(countEl)countEl.textContent=reqs.length;}
     reqEl.innerHTML=reqs.map(r=>`<div class="req-item">
-      <div class="friend-avatar" style="background:${uidColor(r.fromUid)}">${uidInitial(r.fromName)}</div>
+      <div class="friend-avatar" style="background:${avatarBg(r.fromUid,r.fromPhoto)}">${avatarTxt(r.fromName,r.fromPhoto)}</div>
       <div class="friend-info"><div class="friend-name">${r.fromName}</div><div class="friend-meta">รหัส ${r.fromShareCode}</div></div>
       <div class="req-actions">
         <button class="req-accept-btn" onclick="acceptFriendRequest('${r.fromUid}','${r.fromName}','${r.fromShareCode}')">ยอมรับ</button>
@@ -2362,9 +2383,21 @@ async function declineFriendRequest(fromUid){
 window.declineFriendRequest=declineFriendRequest;
 
 async function loadFriendsList(){
-  // โหลด friendsList เสมอ ไม่ขึ้นกับ modal
   try{const snaps=await getDocs(collection(db,'users',currentUser.uid,'friends'));friendsList=snaps.docs.map(d=>({uid:d.id,...d.data()}));}
   catch(e){console.warn(e);friendsList=[];}
+  // โหลดสถานะออนไลน์จาก userCodes ของแต่ละเพื่อน
+  await Promise.all(friendsList.map(async f=>{
+    try{
+      const snap=await getDoc(doc(db,'userCodes',f.shareCode));
+      if(snap.exists()){
+        const d=snap.data();
+        f.online=d.online===true;
+        f.lastSeen=d.lastSeen||null;
+        f.privOnline=d.privOnline!==false; // default true
+        f.photoURL=d.photoURL||null;
+      }
+    }catch(e){}
+  }));
   // render modal เฉพาะตอนเปิดอยู่
   const listEl=document.getElementById('friendsListEl');
   const countEl=document.getElementById('friendCount');
@@ -2374,7 +2407,7 @@ async function loadFriendsList(){
   listEl.innerHTML=friendsList.map(f=>{
     const isViewing=viewState.active==='friend'&&viewState.friendUid===f.uid;
     return `<div class="friend-row">
-      <div class="friend-avatar" style="background:${uidColor(f.uid)}">${uidInitial(f.displayName)}</div>
+      <div class="friend-avatar" style="background:${avatarBg(f.uid,f.photoURL)}">${avatarTxt(f.displayName,f.photoURL)}</div>
       <div class="friend-info"><div class="friend-name">${f.displayName||'ไม่ทราบชื่อ'}</div><div class="friend-meta">รหัส ${f.shareCode}</div></div>
       <button class="friend-view-btn${isViewing?' is-viewing':''}" onclick="viewFriendCalendar('${f.uid}')">${isViewing?'กำลังดู':'ดูปฏิทิน'}</button>
       <button class="friend-remove-btn" onclick="removeFriend('${f.uid}')"><i class="ic" data-icon="trash"></i></button>
@@ -2455,6 +2488,7 @@ async function submitPost(){
     await addDoc(collection(db,'posts'),{
       authorUid:currentUser.uid,
       authorName:currentUser.displayName,
+      authorPhoto:currentUser.photoURL||null,
       text,
       images:feedImages,
       likes:[],
@@ -2519,8 +2553,8 @@ function renderPostCards(posts){
 
 function renderPostCard(post){
   const isMe=post.authorUid===currentUser?.uid;
-  const color=uidColor(post.authorUid);
-  const initial=uidInitial(post.authorName);
+  const bg=avatarBg(post.authorUid,post.authorPhoto);
+  const initial=avatarTxt(post.authorName,post.authorPhoto);
   const liked=(post.likes||[]).includes(currentUser?.uid);
   const likeCount=(post.likes||[]).length;
   const ts=post.createdAt?.toDate?post.createdAt.toDate():post.createdAt?.seconds?new Date(post.createdAt.seconds*1000):new Date();
@@ -2529,7 +2563,7 @@ function renderPostCard(post){
   const imgClass=imgs.length===1?'one':imgs.length===2?'two':imgs.length>=3?'three':'';
   return `<div class="post-card" id="post-${post.id}">
     <div class="post-header">
-      <div class="post-avatar" style="background:${color}">${initial}</div>
+      <div class="post-avatar" style="background:${bg}">${initial}</div>
       <div class="post-meta"><div class="post-name">${post.authorName||'ไม่ทราบชื่อ'}</div><div class="post-time">${timeStr}</div></div>
       ${isMe?`<button class="post-del-btn" onclick="deletePost('${post.id}')"><i class="ic" data-icon="trash"></i></button>`:''}
     </div>
@@ -2546,7 +2580,7 @@ function renderPostCard(post){
     <div class="post-comments" id="comments-${post.id}">
       <div id="comment-list-${post.id}"></div>
       <div class="comment-input-row">
-        <div class="comment-avatar" style="background:${uidColor(currentUser?.uid||'')};width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0">${uidInitial(currentUser?.displayName||'')}</div>
+        <div class="comment-avatar" style="background:${avatarBg(currentUser?.uid||'',currentUser?.photoURL)};width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0">${avatarTxt(currentUser?.displayName||'',currentUser?.photoURL)}</div>
         <input class="comment-input" id="ci-${post.id}" placeholder="เขียนความคิดเห็น..." onkeydown="if(event.key==='Enter')submitComment('${post.id}')">
         <button class="comment-send-btn" onclick="submitComment('${post.id}')"><i class="ic" data-icon="send" style="font-size:12px"></i></button>
       </div>
@@ -2609,7 +2643,7 @@ async function loadComments(postId){
     listEl.innerHTML=snap.docs.map(d=>{
       const c=d.data();
       return `<div class="comment-item">
-        <div class="comment-avatar" style="background:${uidColor(c.authorUid)}">${uidInitial(c.authorName)}</div>
+        <div class="comment-avatar" style="background:${avatarBg(c.authorUid,c.authorPhoto)}">${avatarTxt(c.authorName,c.authorPhoto)}</div>
         <div class="comment-bubble"><div class="comment-author">${c.authorName}</div>${escapeHtml(c.text||'')}</div>
       </div>`;
     }).join('');
@@ -2623,7 +2657,7 @@ async function submitComment(postId){
   input.value='';
   try{
     await addDoc(collection(db,'posts',postId,'comments'),{
-      authorUid:currentUser.uid,authorName:currentUser.displayName,
+      authorUid:currentUser.uid,authorName:currentUser.displayName,authorPhoto:currentUser.photoURL||null,
       text,createdAt:serverTimestamp()
     });
     loadComments(postId);
@@ -2657,9 +2691,26 @@ function renderChatFriends(){
   }
   el.innerHTML=friendsList.map(f=>{
     const active=activeChatFriend?.uid===f.uid;
+    const showOnline=f.privOnline!==false;
+    const isOnline=showOnline&&f.online;
+    const lastSeenText=()=>{
+      if(!showOnline)return'ซ่อนสถานะ';
+      if(isOnline)return'ออนไลน์';
+      if(!f.lastSeen)return'ไม่ทราบ';
+      const diff=Date.now()-f.lastSeen;
+      const min=Math.floor(diff/60000);
+      if(min<1)return'เมื่อกี้';
+      if(min<60)return`${min} นาทีที่แล้ว`;
+      const hr=Math.floor(min/60);
+      if(hr<24)return`${hr} ชม. ที่แล้ว`;
+      return`${Math.floor(hr/24)} วันที่แล้ว`;
+    };
     return `<div class="chat-friend-item ${active?'active':''}" onclick="openChat('${f.uid}')">
-      <div class="chat-friend-avatar" style="background:${uidColor(f.uid)}">${uidInitial(f.displayName)}</div>
-      <div><div class="chat-friend-name">${f.displayName}</div><div class="chat-friend-last">คลิกเพื่อแชท</div></div>
+      <div style="position:relative;flex-shrink:0">
+        <div class="chat-friend-avatar" style="background:${avatarBg(f.uid,f.photoURL)}">${avatarTxt(f.displayName,f.photoURL)}</div>
+        ${isOnline?'<span class="online-dot"></span>':''}
+      </div>
+      <div><div class="chat-friend-name">${f.displayName}</div><div class="chat-friend-last" style="font-size:10px;color:${isOnline?'var(--teal)':'var(--text3)'}">${lastSeenText()}</div></div>
     </div>`;
   }).join('');
   renderIcons(el);
@@ -2675,7 +2726,7 @@ async function openChat(uid){
   win.innerHTML=`
     <div class="chat-topbar">
       <button class="chat-back-btn" onclick="closeChatWindow()"><i class="ic" data-icon="chevron-left"></i></button>
-      <div class="chat-friend-avatar" style="background:${uidColor(uid)};width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:14px">${uidInitial(friend.displayName)}</div>
+      <div class="chat-friend-avatar" style="background:${avatarBg(uid,friend.photoURL)};width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:14px">${avatarTxt(friend.displayName,friend.photoURL)}</div>
       <div class="chat-topbar-name">${friend.displayName}</div>
     </div>
     <div class="chat-messages" id="chatMessages"></div>
@@ -2731,11 +2782,11 @@ function renderChatMessages(msgs,friendUid){
   if(!msgs.length){el.innerHTML='<div style="text-align:center;color:var(--text3);font-size:12px;padding:20px">เริ่มการสนทนาได้เลย 👋</div>';return;}
   el.innerHTML=msgs.map(msg=>{
     const mine=msg.senderUid===currentUser.uid;
-    const color=mine?uidColor(currentUser.uid):uidColor(friendUid);
-    const initial=mine?uidInitial(currentUser.displayName):uidInitial(activeChatFriend?.displayName||'');
+    const bg=mine?avatarBg(currentUser.uid,currentUser.photoURL):avatarBg(friendUid,activeChatFriend?.photoURL);
+    const initial=mine?avatarTxt(currentUser.displayName,currentUser.photoURL):avatarTxt(activeChatFriend?.displayName||'',activeChatFriend?.photoURL);
     const ts=msg.createdAt?.toDate?msg.createdAt.toDate():msg.createdAt?.seconds?new Date(msg.createdAt.seconds*1000):new Date();
     return `<div class="msg-row ${mine?'mine':''}">
-      <div class="msg-avatar" style="background:${color}">${initial}</div>
+      <div class="msg-avatar" style="background:${bg}">${initial}</div>
       <div class="msg-bubble">
         ${msg.image?`<img class="msg-img" src="${msg.image}" onclick="openLightbox('${msg.image.substring(0,30)}')" data-src="${msg.image}">`:''}
         ${msg.text?escapeHtml(msg.text):''}
@@ -2789,10 +2840,12 @@ function loadSettingsProfile(){
     document.getElementById('settingsNameEl').textContent='ยังไม่ได้เข้าสู่ระบบ';
     document.getElementById('settingsEmailEl').textContent='-';
     document.getElementById('settingsShareCodeEl').textContent='';
+    const rb=document.getElementById('removePhotoBtn');if(rb)rb.style.display='none';
     return;
   }
-  document.getElementById('settingsAvatarCircle').textContent=uidInitial(currentUser.displayName);
-  document.getElementById('settingsAvatarCircle').style.background=uidColor(currentUser.uid);
+  document.getElementById('settingsAvatarCircle').textContent=avatarTxt(currentUser.displayName,currentUser.photoURL);
+  document.getElementById('settingsAvatarCircle').style.background=avatarBg(currentUser.uid,currentUser.photoURL);
+  const rb=document.getElementById('removePhotoBtn');if(rb)rb.style.display=currentUser.photoURL?'':'none';
   document.getElementById('settingsNameEl').textContent=currentUser.displayName||'-';
   document.getElementById('settingsEmailEl').textContent=currentUser.email||'-';
   document.getElementById('settingsShareCodeEl').textContent='รหัสแชร์: '+(currentUser.shareCode||'-');
@@ -2872,7 +2925,13 @@ function applySetting(key,value){
       }
     }
   }
-  if(key==='privOnline'){updateOnlineStatus(value);}
+  if(key==='privOnline'){
+    updateOnlineStatus(value);
+    // บันทึก privOnline flag ลง userCodes ให้เพื่อนอ่านได้
+    if(currentUser&&!currentUser.isGuest){
+      setDoc(doc(db,'userCodes',currentUser.shareCode),{privOnline:!!value},{merge:true}).catch(()=>{});
+    }
+  }
   if(key==='privCalendar'){
     if(currentUser&&!currentUser.isGuest){
       setDoc(doc(db,'userCodes',currentUser.shareCode),{privCalendar:!!value},{merge:true}).catch(()=>{});
@@ -2918,7 +2977,10 @@ function playBeep(){
 async function updateOnlineStatus(isOnline){
   if(!currentUser||currentUser.isGuest)return;
   try{
-    await setDoc(doc(db,'userCodes',currentUser.shareCode),{online:isOnline,lastSeen:Date.now()},{merge:true});
+    await setDoc(doc(db,'userCodes',currentUser.shareCode),{
+      online:isOnline,
+      lastSeen:Date.now()
+    },{merge:true});
   }catch(e){}
 }
 
@@ -3006,6 +3068,76 @@ async function editDisplayName(){
   }catch(e){scAlertErr('เกิดข้อผิดพลาด: '+e.message);}
 }
 window.editDisplayName=editDisplayName;
+
+/* ── Profile Photo ── */
+function resizeImageFile(file,maxSize=240,quality=0.82){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=e=>{
+      const img=new Image();
+      img.onload=()=>{
+        const w=img.width,h=img.height;
+        const side=Math.min(w,h);
+        const sx=(w-side)/2,sy=(h-side)/2;
+        const canvas=document.createElement('canvas');
+        canvas.width=maxSize;canvas.height=maxSize;
+        const ctx=canvas.getContext('2d');
+        ctx.drawImage(img,sx,sy,side,side,0,0,maxSize,maxSize);
+        resolve(canvas.toDataURL('image/jpeg',quality));
+      };
+      img.onerror=()=>reject(new Error('ไม่สามารถอ่านไฟล์รูปภาพได้'));
+      img.src=e.target.result;
+    };
+    reader.onerror=()=>reject(new Error('อ่านไฟล์ไม่สำเร็จ'));
+    reader.readAsDataURL(file);
+  });
+}
+
+function pickProfilePhoto(){
+  if(!currentUser||currentUser.isGuest){scAlertWarn('กรุณาเข้าสู่ระบบก่อน',{title:'ยังไม่ได้เข้าสู่ระบบ'});return;}
+  document.getElementById('profilePhotoInput').click();
+}
+window.pickProfilePhoto=pickProfilePhoto;
+
+async function onProfilePhotoSelected(e){
+  const file=e.target.files[0];
+  e.target.value='';
+  if(!file)return;
+  if(!file.type.startsWith('image/')){scAlertWarn('กรุณาเลือกไฟล์รูปภาพ',{title:'ไฟล์ไม่ถูกต้อง'});return;}
+  if(file.size>8*1024*1024){scAlertWarn('ไฟล์รูปใหญ่เกินไป (สูงสุด 8MB)',{title:'ไฟล์ใหญ่เกินไป'});return;}
+  try{
+    const dataUrl=await resizeImageFile(file);
+    await saveProfilePhoto(dataUrl);
+  }catch(err){scAlertErr('อัปโหลดรูปไม่สำเร็จ: '+(err.message||err));}
+}
+window.onProfilePhotoSelected=onProfilePhotoSelected;
+
+async function saveProfilePhoto(dataUrl){
+  try{
+    await Promise.all([
+      setDoc(doc(db,'users',currentUser.uid,'profile','settings'),{photoURL:dataUrl},{merge:true}),
+      setDoc(doc(db,'userCodes',currentUser.shareCode),{photoURL:dataUrl},{merge:true})
+    ]);
+    currentUser.photoURL=dataUrl;
+    updateUserBar();loadSettingsProfile();
+    scAlertOk('เปลี่ยนรูปโปรไฟล์เรียบร้อยแล้ว',{title:'สำเร็จ'});
+  }catch(e){scAlertErr('บันทึกรูปไม่สำเร็จ: '+e.message);}
+}
+
+async function removeProfilePhoto(){
+  if(!currentUser||currentUser.isGuest||!currentUser.photoURL)return;
+  if(!await scConfirm('ใช้ตัวอักษรเริ่มต้นแทนรูปโปรไฟล์นี้?',{title:'ลบรูปโปรไฟล์'}))return;
+  try{
+    await Promise.all([
+      setDoc(doc(db,'users',currentUser.uid,'profile','settings'),{photoURL:deleteField()},{merge:true}),
+      setDoc(doc(db,'userCodes',currentUser.shareCode),{photoURL:deleteField()},{merge:true})
+    ]);
+    currentUser.photoURL=null;
+    updateUserBar();loadSettingsProfile();
+    scAlertOk('ลบรูปโปรไฟล์แล้ว',{title:'สำเร็จ'});
+  }catch(e){scAlertErr('ลบรูปไม่สำเร็จ: '+e.message);}
+}
+window.removeProfilePhoto=removeProfilePhoto;
 
 async function confirmClearAll(){
   if(!await scConfirm('ลบกิจกรรมและตารางเรียนทั้งหมด?\nการกระทำนี้ไม่สามารถกู้คืนได้',{title:'ลบข้อมูลทั้งหมด',danger:true}))return;
